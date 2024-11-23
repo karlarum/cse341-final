@@ -11,12 +11,28 @@ const connectDb = async () => {
   try {
     const client = new MongoClient(uri);
     await client.connect();
-    db = client.db("task_manager");
+    db = client.db("team");
     console.log("Connected to MongoDB");
   } catch (error) {
     console.error("Failed to connect to MongoDB", error);
   }
 };
+
+// const connectDb = async () => {
+//   try {
+//     const client = new MongoClient(uri);
+//     await client.connect();
+//     db = client.db("team");
+//     console.log("Connected to MongoDB");
+
+//     // Test query
+//     const testCollection = db.collection("category");
+//     const data = await testCollection.find({}).toArray();
+//     console.log("Sample data from 'test' collection:", data);
+//   } catch (error) {
+//     console.error("Failed to connect to MongoDB", error);
+//   }
+// };
 
 const getDb = () => {
   if (!db) {

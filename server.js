@@ -3,12 +3,15 @@ const mongoose = require("mongoose");
 const mongoDB = require("./database/connect");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
+const categoryRoutes = require("./routes/category");
 require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app
+  .use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+  .use("/category", categoryRoutes);
 
 // Connect to MongoDB
 mongoDB.connectDb();
