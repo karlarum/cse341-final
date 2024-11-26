@@ -8,6 +8,7 @@ router.use("/", require("./swagger"));
 router.use("/category", require("./catergoryRoutes"));
 router.use("/item", require("./itemRoutes"));
 router.use("/user", require("./userRoutes"));
+router.use("/coverage", require("./coverageRoutes"));
 
 // Exports router object 
 module.exports = router;
