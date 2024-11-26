@@ -5,7 +5,7 @@ const router = require("express").Router();
 router.use("/", require("./swagger"));
 
 // Set up other routes 
-// router.use("/category", require("./catergoryRoutes"));
+router.use("/category", require("./catergoryRoutes"));
 router.use("/item", require("./itemRoutes"));
 router.use("/user", require("./userRoutes"));
 router.use("/coverage", require("./coverageRoutes"));
