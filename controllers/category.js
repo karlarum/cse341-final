@@ -21,12 +21,16 @@ const getCategories = async (req, res) => {
 
 // Function to get a single Category by ID
 const getCategoryById = async (req, res) => {
-  const categoryId = req.params.id;
+  const objectId = new ObjectId(req.params.id);
 
+  // Check if the contactId is a valid ObjectId
+  if (!ObjectId.isValid(objectId)) {
+    return res.status(400).json({ error: "Invalid ID" }); // Return 400 for invalid ID format
+  }
   try {
     const db = getDb();
-    const categorysCollection = db.collection("category");
-    const category = await categorysCollection.findOne({ _id: categoryId });
+    const categoryCollection = db.collection("category");
+    const category = await categoryCollection.findOne({ _id: objectId });
 
     if (!category) {
       return res.status(404).json({ error: "Category not found" });
@@ -41,16 +45,11 @@ const getCategoryById = async (req, res) => {
 
 /* CREATE Category */
 const createCategory = async (req, res) => {
-  console.log("req body", req.body);
-
   const category = {
-    _id: req.body._id,
     name: req.body.name,
     description: req.body.description,
     parent_id: req.body.parent_id || null,
   };
-  console.log("req body", req.body);
-  console.log("Category", category);
   try {
     const db = getDb();
     const response = await db.collection("category").insertOne(category);
@@ -66,18 +65,26 @@ const createCategory = async (req, res) => {
 
 /* UPDATE Category */
 const updateCategory = async (req, res) => {
-  const CategoryId = new ObjectId(req.params.id);
+  const objectId = new ObjectId(req.params.id);
+  console.log("Converted categoryId:", objectId);
+
   const updatedCategory = {
-    user_id: req.body.user_id,
     name: req.body.name,
     description: req.body.description,
     parent_id: req.body.parent_id || null,
   };
   try {
     const db = getDb();
-    const response = await db
-      .collection("Category")
-      .updateOne({ _id: CategoryId }, { $set: updatedCategory });
+    const categoryCollection = db.collection("category");
+    const response = await categoryCollection.updateOne(
+      { _id: objectId },
+      { $set: updatedCategory }
+    );
+    console.log("response", response);
+    // const response = await db
+    //   .collection("Category")
+    //   .findOne({ _id: objectId }
+
     if (response.modifiedCount > 0) {
       res.status(200).json({ message: "Category updated successfully." });
     } else {
