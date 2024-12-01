@@ -4,6 +4,7 @@ const mongoDB = require("./database/connect");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
 const categoryRoutes = require("./routes/category");
+const itemRoutes = require("./routes/itemRoutes");
 require("dotenv").config();
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(express.json());
 app
   .use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument))
   .use("/category", categoryRoutes)
+  .use("/item", itemRoutes)
   .use("/", require("./src/routes"));
 
 // Connect to MongoDB

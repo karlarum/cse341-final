@@ -29,6 +29,44 @@ Content-Type: application/json
     "parent_id": null
 }
 
+### LOCAL ITEM REQUESTS ###
+
+### local get all items ###
+GET http://localhost:3000/item
+
+### local get item by ID ###
+GET http://localhost:3000/item/674bf7c88b3e5fa76a8e4bf8
+
+### local create item ###
+POST http://localhost:3000/item HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Bookshelf",
+  "userId": null,
+  "categoryId": null,
+  "coverageId": null,
+  "purchaseDate": "2022-02-12",
+  "purchasePrice": 300.00,
+  "description": "Solid wood bookshelf with five shelves"
+}
+
+### local update item ###
+PUT http://localhost:3000/item/674bf7c88b3e5fa76a8e4bf8 HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Gaming Laptop",
+  "userId": null,
+  "categoryId": null,
+  "coverageId": null,
+  "purchaseDate": "2024-07-15",
+  "purchasePrice": 1200.00,
+  "description": "High-performance gaming laptop with latest graphics card"
+}
+
+### local delete item by ID ###
+DELETE http://localhost:3000/item/674bfea80b7b4292fce14467
 
 ### PRODUCTION REQUESTS
 
