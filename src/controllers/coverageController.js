@@ -21,7 +21,7 @@ const getCoverageById = async (req, res, next) => {
     // // Get reference to db
     const db = mongodb.getDb();
     // Convert id into Mongo ObjectId
-    const coverageId = req.params.id;
+    const coverageId = new ObjectId(req.params.id);
 
     // Run a check to see if the ID is valid
     if (!ObjectId.isValid(coverageId)) {
@@ -111,7 +111,7 @@ const updateCoverage = async (req, res, next) => {
 
     // Access coverage by id
     const record = await collection
-      .findOne({ _id: ObjectId(coverageId) });
+      .findOne({ _id: new ObjectId(coverageId) });
 
     // Return error is coverage record not found
     if (!record) {
@@ -120,7 +120,7 @@ const updateCoverage = async (req, res, next) => {
 
     // Update coverage record with coverageObj data
     const coverage = await collection
-      .replaceOne({ _id: ObjectId(coverageId)}, coverageObj);
+      .replaceOne({ _id: new ObjectId(coverageId)}, coverageObj);
 
     // Update successful
     if (coverage.modifiedCount > 0) {
