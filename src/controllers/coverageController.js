@@ -5,13 +5,21 @@ const getAllCoverage = async (req, res, next) => {
   try {
     // Get reference to db
     const db = mongodb.getDb();
+    // Log whether database connection is good
+    if (!db) {
+      console.error("Database connection is null or undefined.");
+      return res.status(500).json({ error: "Database connection failed." });
+    }
 
     // Get records in coverage collection
     const coverage = await db.collection("coverage").find().toArray();
+    // Log the results of the find query
+    console.log("Coverage records retrieved:", coverage);
 
     // HTTP successful response with coverage data
     res.status(200).json(coverage);
   } catch (error) {
+    console.error("Error getting all coverages: ", error);
     res.status(500).json({ error: "Failed to get records." });
   }
 }
