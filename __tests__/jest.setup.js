@@ -75,82 +75,42 @@ describe("Tests for connectDb function", () => {
 
   test("Should handle connection refused error", async () => {
     // Mock case: Connection refused
-    // jest.mock("mongodb", () => {
-    //   const originalModule = jest.requireActual("mongodb");
-    //   return {
-    //     ...originalModule,
-    //     MongoClient: jest.fn(() => ({
-    //       connect: jest.fn(() => {
-    //         throw new Error("Connection refused on port");
-    //       }),
-    //     })),
-    //   };
-    // });
     jest.mock("mongodb", () => {
-      const original = jest.requireActual("mongodb");
+      const originalModule = jest.requireActual("mongodb");
       return {
-        ...original,
-        MongoClient: jest.fn().mockImplementation(() => ({
+        ...originalModule,
+        MongoClient: jest.fn(() => ({
           connect: jest.fn(() => {
-            throw new Error("Simulated connection failure"); // Simulate error
+            throw new Error("Connection refused on port");
           }),
         })),
       };
     });
-    
 
-    // const { connectDb } = require("../database/connect");
-
-    // await connectDb();
-
-    // // Verify console.error was called
-    // expect(spyConsoleErr).toHaveBeenCalledWith(
-    //   "Failed to connect to MongoDB",
-    //   expect.any(Error)
-    // );
-    spyConsoleErr = jest.spyOn(console, "error").mockImplementation();
-
-    // Attempt to connect (should fail)
     const { connectDb } = require("../database/connect");
+
     await connectDb("team");
 
-    // Verify the catch block executed
-    expect(spyConsoleErr).toHaveBeenCalled();
+    // Verify console.error was called
     expect(spyConsoleErr).toHaveBeenCalledWith(
       "Failed to connect to MongoDB",
       expect.any(Error)
     );
-
-    // Restore mocks
-    spyConsoleErr.mockRestore();
-    jest.unmock("mongodb");
   });
 
   test("Should handle generic connection failure", async () => {
     // Mock case: Generic connection failure
-    // jest.mock("mongodb", () => {
-    //   const originalModule = jest.requireActual("mongodb");
-    //   return {
-    //     ...originalModule,
-    //     MongoClient: jest.fn(() => ({
-    //       connect: jest.fn(() => {
-    //         throw new Error("Generic connection failure");
-    //       }),
-    //     })),
-    //   };
-    // });
     jest.mock("mongodb", () => {
-      const original = jest.requireActual("mongodb");
+      const originalModule = jest.requireActual("mongodb");
       return {
-        ...original,
-        MongoClient: jest.fn().mockImplementation(() => ({
+        ...originalModule,
+        MongoClient: jest.fn(() => ({
           connect: jest.fn(() => {
-            throw new Error("Simulated connection failure"); // Simulate error
+            throw new Error("Generic connection failure");
           }),
         })),
       };
     });
-    
 
     const { connectDb } = require("../database/connect");
 
