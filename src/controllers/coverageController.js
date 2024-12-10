@@ -28,11 +28,14 @@ const getCoverageById = async (req, res, next) => {
   try {
     // // Get reference to db
     const db = mongodb.getDb();
+    console.log("RAN GETDB FUNCTION");
     // Convert id into Mongo ObjectId
     const coverageId = new ObjectId(req.params.id);
+    console.log("CREATED NEW MONGODB OBJECT ID");
 
     // Run a check to see if the ID is valid
     if (!ObjectId.isValid(coverageId)) {
+      console.log("MONGODB OBJECTID INVALID");
       return res.status(400).json({ error: "Please use a valid ID." });
     }
 
@@ -40,16 +43,19 @@ const getCoverageById = async (req, res, next) => {
     const coverage = await db
       .collection("coverage")
       .findOne({ _id: coverageId });
+    console.log("COVERAGE COLLECTION ID MATCHED");
 
     if (!coverage) {
+      console.log("COVERAGE COLLECTION ID NOT MATCHED");
       return res.status(404).json({ error: "Search failed. No record found."});
     }
-
+    console.log("RECEIVED SUCCESSFUL RESPONSE FROM COVERAGE");
     // Successful response
     res.status(200).json(coverage);
   } catch (error) {
     // Internal server error
     res.status(500).json({ error: "An error occurred while fetching data." });
+    // console.error("Failed to connect to MongoDB", error);
   }
 }
 

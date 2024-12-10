@@ -34,7 +34,6 @@ describe("Tests for connectDb function", () => {
   });  
 });
 
-// *****TESTING START*****
 describe("Tests for connectDb function", () => {
   let spyConsoleErr;
 
@@ -73,58 +72,56 @@ describe("Tests for connectDb function", () => {
     );
   });
 
-  test("Should handle connection refused error", async () => {
-    // Mock case: Connection refused
-    jest.mock("mongodb", () => {
-      const originalModule = jest.requireActual("mongodb");
-      return {
-        ...originalModule,
-        MongoClient: jest.fn(() => ({
-          connect: jest.fn(() => {
-            throw new Error("Connection refused on port");
-          }),
-        })),
-      };
-    });
+  // test("Should handle connection refused error", async () => {
+  //   // Mock case: Connection refused
+  //   jest.mock("mongodb", () => {
+  //     const originalModule = jest.requireActual("mongodb");
+  //     return {
+  //       ...originalModule,
+  //       MongoClient: jest.fn(() => ({
+  //         connect: jest.fn(() => {
+  //           throw new Error("Connection refused on port");
+  //         }),
+  //       })),
+  //     };
+  //   });
 
-    const { connectDb } = require("../database/connect");
+  //   const { connectDb } = require("../database/connect");
 
-    await connectDb("team");
+  //   await connectDb("team");
 
-    // Verify console.error was called
-    expect(spyConsoleErr).toHaveBeenCalledWith(
-      "Failed to connect to MongoDB",
-      expect.any(Error)
-    );
-  });
+  //   // Verify console.error was called
+  //   expect(spyConsoleErr).toHaveBeenCalledWith(
+  //     "Failed to connect to MongoDB",
+  //     expect.any(Error)
+  //   );
+  // });
 
-  test("Should handle generic connection failure", async () => {
-    // Mock case: Generic connection failure
-    jest.mock("mongodb", () => {
-      const originalModule = jest.requireActual("mongodb");
-      return {
-        ...originalModule,
-        MongoClient: jest.fn(() => ({
-          connect: jest.fn(() => {
-            throw new Error("Generic connection failure");
-          }),
-        })),
-      };
-    });
+  // test("Should handle generic connection failure", async () => {
+  //   // Mock case: Generic connection failure
+  //   jest.mock("mongodb", () => {
+  //     const originalModule = jest.requireActual("mongodb");
+  //     return {
+  //       ...originalModule,
+  //       MongoClient: jest.fn(() => ({
+  //         connect: jest.fn(() => {
+  //           throw new Error("Generic connection failure");
+  //         }),
+  //       })),
+  //     };
+  //   });
 
-    const { connectDb } = require("../database/connect");
+  //   const { connectDb } = require("../database/connect");
 
-    await connectDb("team");
+  //   await connectDb("team");
 
-    // Verify console.error was called
-    expect(spyConsoleErr).toHaveBeenCalledWith(
-      "Failed to connect to MongoDB",
-      expect.any(Error)
-    );
-  });
+  //   // Verify console.error was called
+  //   expect(spyConsoleErr).toHaveBeenCalledWith(
+  //     "Failed to connect to MongoDB",
+  //     expect.any(Error)
+  //   );
+  // });
 });
-
-// *****TESTING ENDED*****
 
 describe("Tests for getDb function", () => {
   afterEach(() => {
@@ -279,8 +276,6 @@ describe("Tests for /coverage routes", () => {
 // });
 
 // describe("Tests for /coverage routes", () => {
-    
-
   test("Return all coverage records", async () => {
     const res = await request(app).get("/coverage");
 
@@ -330,30 +325,6 @@ describe("Tests for /coverage routes", () => {
 
     expect(res.statusCode).toBe(404);
     expect(res.body).toEqual({ error: "Search failed. No record found." });
-  });
-
-  test("Should return 500 for server error", async () => {
-    // Create a mock id
-    const mockId = new ObjectId().toString(); 
-
-    // Mock the database call to throw an error
-    jest.spyOn(db, "collection").mockImplementation(() => {
-      return {
-        findOne: jest.fn(() => {
-          // console.log("Simulated findOne error");
-          // throw new Error ("Simulated database error.");
-        }),
-      };
-    });
-    
-    // Send get request
-    const res = await request(app).get(`/coverage/${mockId}`);
-
-    expect(res.statusCode).toBe(500);
-    expect(res.body).toEqual({ error: "An error occurred while fetching data." });
-
-    // Remove mocks, restore function to original state
-    jest.restoreAllMocks();
   });
 
   test("Add new coverage record", async () => {
@@ -483,3 +454,230 @@ describe("Tests for /coverage routes", () => {
     expect(record).toBeNull();
   });
 });
+
+// describe("Test for /coverage error responses", () => {
+//   // let connection;
+//   let db;
+//   // let result;
+
+//   /* Set up connection var to MongoDB. Assign team database to the db var. */
+//   beforeAll(async () => {
+//     connection = await MongoClient.connect(global.__MONGO_URI__);
+//     // Connect to team database explicitly
+//     db = await connection.db("team");
+//     // db = await connectDb("team");
+
+//     try {
+//       await connectDb(connection);
+//     } catch (error) {
+//       console.error("Failed to initialize database:", error);
+//       throw error; // Ensure Jest is aware of the failure
+//     }
+//   });
+
+//   /* Jest lifecycle method, runs once after all tests in file have completed. Closes db connection, frees up resources, prevents memory leaks. */
+//   afterAll(async () => {
+//     await db.close();
+//     jest.clearAllMocks(); // Clear any mock behavior
+//   });
+  
+//   beforeEach(async () => {
+//     // Replace db variable with mocked version
+//     jest.mock("../database/connect", () => {
+//       // Import real mod in connect.js, but replace db
+//       const ogModule = jest.requireActual("../database/connect");
+//       // ret connect.js exports, replaces db export w/mock db
+//       return {
+//         ...ogModule,
+//       // Replace w/undefined to test when db not initialized
+//         db: 500, // Simulate uninitialized db
+//       };
+//     });
+//     // const db = getDb();
+//     // console.log("DBNAME BEFOREEACH: ", db.databaseName);
+//     // Clear the collection before adding data
+//     // await db.collection("coverage").deleteMany({});
+//   });
+
+//   // Clear all database collections after each test
+//   afterEach(async () => {
+//     // Reset mocks and restore og models
+//     jest.resetModules();
+//   });
+
+//   test("Should return 500 for server error", async () => {
+//     // Create a mock id
+//     const mockId = new ObjectId().toString(); 
+
+//     // Mock the database call to throw an error
+//     // jest.spyOn(db, "collection").mockImplementation(() => {
+//     //   return {
+//     //     findOne: jest.fn(() => {
+//     //       // console.log("Simulated findOne error");
+//     //       // throw new Error ("Simulated database error.");
+//     //     }),
+//     //   };
+//     // });
+    
+//     // Send get request
+//     // const res = await request(app).get(`/coverage/${mockId}`);
+//     const res = getDb();
+
+//     expect(res.statusCode).toBe(500);
+//     expect(res.body).toEqual({ error: "An error occurred while fetching data." });
+
+//     // Remove mocks, restore function to original state
+//     jest.restoreAllMocks();
+//   });
+// })
+
+describe("Test controllers for 500 response", () => {
+  // let spyConsoleErr;
+
+  beforeEach(() => {
+    // Mock console.error to track its calls
+    // spyConsoleErr = jest.spyOn(console, "error").mockImplementation();
+  });
+
+  afterEach(() => {
+    // Restore mocks
+    jest.clearAllMocks();
+    // spyConsoleErr.mockRestore();
+    // Remove mock so other tests are not affected
+    jest.unmock("../database/connect");
+  });
+
+  test("Should return 500 if getCoverageById fails", async () => {
+    // Mock causes mongodb.getDb to throw an error
+    jest.mock("../database/connect", () => ({
+      getDb: jest.fn(() => {
+        throw new Error("Failed to connect to MongoDB.");
+      }),
+    }));
+
+    const { getCoverageById } = require("../src/controllers/coverageController");
+
+    // Mock Express req and res objects
+    const req = {
+      params: {
+        // Mock valid ObjectId
+        id: "64b2fc2a4f0c9c1d2f8c8a4b", 
+      },
+    };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    // Call the function with the mocked req/res values
+    await getCoverageById(req, res);
+
+    // Test that res.status is called with 500
+    expect(res.status).toHaveBeenCalledWith(500);
+    // Test that res.json is called with correct message
+    expect(res.json).toHaveBeenCalledWith({
+      error: "An error occurred while fetching data.",
+    });
+
+    // Verify that console.error was called
+    // expect(spyConsoleErr).toHaveBeenCalledWith(
+    //   expect.stringContaining("Failed to connect to MongoDB"),
+    //   expect.any(Error)
+    // );
+  });
+
+  test("Should return 500 if createCoverage fails", async () => {
+    // Mock causes mongodb.getDb to throw an error
+    jest.mock("../database/connect", () => ({
+      getDb: jest.fn(() => {
+        throw new Error("Failed to connect to MongoDB.");
+      }),
+    }));
+
+    const { createCoverage } = require("../src/controllers/coverageController");
+
+    // Mock Express req and res objects
+    const req = {};
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    // Call the function with the mocked req/res values
+    await createCoverage(req, res);
+
+    // Test that res.status is called with 500
+    expect(res.status).toHaveBeenCalledWith(500);
+    // Test that res.json is called with correct message
+    expect(res.json).toHaveBeenCalledWith({
+      error: "An error occurred while attempting to create record.",
+    });
+  });
+
+  test("Should return 500 if updateCoverage fails", async () => {
+    // Mock causes mongodb.getDb to throw an error
+    jest.mock("../database/connect", () => ({
+      getDb: jest.fn(() => {
+        throw new Error("Failed to connect to MongoDB.");
+      }),
+    }));
+
+    const { updateCoverage } = require("../src/controllers/coverageController");
+
+    // Mock Express req and res objects
+    const req = {};
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    // Call the function with the mocked req/res values
+    await updateCoverage(req, res);
+
+    // Test that res.status is called with 500
+    expect(res.status).toHaveBeenCalledWith(500);
+    // Test that res.json is called with correct message
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Failed to update record.",
+    });
+  });
+
+  test("Should return 500 if deleteCoverage fails", async () => {
+    // Mock causes mongodb.getDb to throw an error
+    jest.mock("../database/connect", () => ({
+      getDb: jest.fn(() => {
+        throw new Error("Failed to connect to MongoDB.");
+      }),
+    }));
+
+    const { deleteCoverage } = require("../src/controllers/coverageController");
+
+    // Mock Express req and res objects
+    const req = {};
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    // Call the function with the mocked req/res values
+    await deleteCoverage(req, res);
+
+    // Test that res.status is called with 500
+    expect(res.status).toHaveBeenCalledWith(500);
+    // Test that res.json is called with correct message
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Failed to delete record.",
+    });
+  });
+});
+
+// describe("Tests for createCoverage function", () => {
+//   afterEach(() => {
+//     // Restore mocks
+//     jest.clearAllMocks();
+//     // Remove mock so other tests are not affected
+//     jest.unmock("../database/connect");
+//   });
+
+  
+// });

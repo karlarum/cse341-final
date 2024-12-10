@@ -13,15 +13,10 @@ const connectDb = async (clientDb) => {
   }
   try {
     const client = new MongoClient(uri);
-    console.log("Creating MongoClient...");
-    // client = new MongoClient(uri);
-    console.log("Attempting to connect...");
     await client.connect();
-    console.log("Connection successful!");
     db = client.db("team");
     console.log("Connected to MongoDB:", db.databaseName);
   } catch (error) {
-    console.log("ERROR CATCH BLOCK EXECUTED");
     console.error("Failed to connect to MongoDB", error);
   }
 };
