@@ -99,7 +99,7 @@ const updateCoverage = async (req, res, next) => {
 
     // Run a check to see if the ID is valid
     if (!ObjectId.isValid(coverageId)) {
-      return res.status(400).json({ error: "Please use a valid ID." });
+      return res.status(422).json({ error: "Please use a valid ID." });
     }
 
     // Coverage obejct values fetched from body
@@ -115,10 +115,8 @@ const updateCoverage = async (req, res, next) => {
     }
 
     // Access coverage collection
-    const collection = db.collection("coverage");
-
-    // Access coverage by id
-    const record = await collection
+    const record = await db
+      .collection("coverage")
       .findOne({ _id: new ObjectId(coverageId) });
 
     // Return error is coverage record not found
@@ -127,8 +125,8 @@ const updateCoverage = async (req, res, next) => {
     }
 
     // Update coverage record with coverageObj data
-    const coverage = await collection
-      .replaceOne({ _id: new ObjectId(coverageId)}, coverageObj);
+    const coverage = await db.collection("coverage")
+      .replaceOne({ _id: new ObjectId(coverageId) }, coverageObj);
 
     // Update successful
     if (coverage.modifiedCount > 0) {

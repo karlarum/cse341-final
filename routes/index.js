@@ -2,7 +2,7 @@
 const router = require("express").Router();
 
 // Set up Swagger subroute
-router.use("/", require("./swagger"));
+// router.use("/", require("./swagger"));
 
 // Set up other routes 
 router.use("/category", require("./catergoryRoutes"));

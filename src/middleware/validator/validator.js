@@ -44,13 +44,13 @@ const coverageValidation = () => {
       .exists({ checkFalsy: true })
         .withMessage("A policy creation date is required.")
       .bail()
-      .isDate({ format: 'YYYY-MM-DD', strictMode: true })
-        .withMessage('Please enter date in the format YYYY-MM-DD.'),
+      .isDate({ format: "YYYY-MM-DD", strictMode: true })
+        .withMessage("Please enter date in the format YYYY-MM-DD."),
     body("renewalDate")
       .exists({ checkFalsy: true })
         .withMessage("A policy renewal date is required.")
       .bail()
-      .isDate({ format: 'YYYY-MM-DD', strictMode: true })
+      .isDate({ format: "YYYY-MM-DD", strictMode: true })
         .withMessage("Please use the following format: YYYY-MM-DD.")
   ];
 }
