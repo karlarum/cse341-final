@@ -1,11 +1,9 @@
 const { getDb } = require("../database/connect");
 
-// CREATE user
 const createUser = async (req, res) => {
     const user = {
         username: req.body.username,
-        password: req.body.password, // In a real app, hash this!
-        // ... other user properties
+        password: req.body.password,
     };
 
     try {
@@ -25,7 +23,6 @@ const createUser = async (req, res) => {
     }
 };
 
-// LOGIN user  (POST is more common for login)
 const loginUser = async (req, res) => {
     const { username, password } = req.body;
 
@@ -37,13 +34,11 @@ const loginUser = async (req, res) => {
             return res.status(401).json({ error: "Invalid credentials" }); // Unauthorized
         }
 
-        // In a real app, compare hashed passwords!
-        if (user.password !== password) {  // Placeholder - Replace with secure password comparison
-            return res.status(401).json({ error: "Invalid credentials" }); // Unauthorized
+        if (user.password !== password) {
+            return res.status(401).json({ error: "Invalid credentials" });
         }
 
 
-        // Set up session (example using Express sessions - you'll need to configure this middleware in your main app file)
         req.session.user = user;
         res.status(200).json({ message: "Login successful", user: { username: user.username } });
 
@@ -60,7 +55,7 @@ const logoutUser = async (req, res) => {
                 console.error("Error destroying session:", err);
                 return res.status(500).json({ error: "Logout failed" });
             }
-            res.clearCookie('connect.sid'); // Clear the session cookie (important!)
+            res.clearCookie('connect.sid');
             res.status(200).json({ message: "Logout successful" });
         });
 
