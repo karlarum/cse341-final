@@ -94,8 +94,9 @@ const getUserByUsername = async (req, res) => {
 const updateUser = async (req, res) => {
     const username = req.params.username;
     const updatedUserData = {
-        // ... properties to update (e.g., password, email, etc.)
-    }; // Make sure to sanitize/validate input!
+        username: req.body.username,
+        password: req.body.password,
+    };
 
     try {
         const db = getDb();
@@ -135,6 +136,9 @@ const deleteUser = async (req, res) => {
     }
 };
 
+const getSession = (req) => {
+    return req.session.user;
+}
 
 module.exports = {
     createUser,
@@ -143,4 +147,5 @@ module.exports = {
     getUserByUsername,
     updateUser,
     deleteUser,
+    getSession
 };

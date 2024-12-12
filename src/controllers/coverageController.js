@@ -34,7 +34,7 @@ const getCoverageById = async (req, res, next) => {
       .findOne({ _id: coverageId });
 
     if (!coverage) {
-      return res.status(404).json({ error: "Search failed. No record found."});
+      return res.status(404).json({ error: "Search failed. No record found." });
     }
 
     // Successful response
@@ -48,12 +48,12 @@ const getCoverageById = async (req, res, next) => {
 const createCoverage = async (req, res, next) => {
   try {
     // Access the form data stored in req.body
-    const { 
+    const {
       name, insuranceCompany, policyNumber, coverageInfo, contactNumber, email, creationDate, renewalDate
     } = req.body;
 
     const coverageObj = {
-      name, insuranceCompany, policyNumber, coverageInfo,  contactNumber, email, creationDate, renewalDate
+      name, insuranceCompany, policyNumber, coverageInfo, contactNumber, email, creationDate, renewalDate
     }
 
     // get the MongoDB database instance
@@ -65,9 +65,9 @@ const createCoverage = async (req, res, next) => {
 
     // Successful response
     if (coverage.acknowledged) {
-      res.status(201).json({ 
-        message: "Coverage record created successfully.", 
-        id: coverage.insertedId 
+      res.status(201).json({
+        message: "Coverage record created successfully.",
+        id: coverage.insertedId
       });
     } else {
       // Bad request
@@ -78,7 +78,7 @@ const createCoverage = async (req, res, next) => {
   } catch (error) {
     // Internal server error
     res.status(500).json({ error: "An error occurred while attempting to create record." });
-    
+
   }
 }
 
@@ -96,13 +96,13 @@ const updateCoverage = async (req, res, next) => {
 
     // Coverage obejct values fetched from body
     const coverageObj = {
-      name: req.body.name, 
-      insuranceCompany: req.body.insuranceCompany, 
-      policyNumber: req.body.policyNumber, 
-      coverageInfo: req.body.coverageInfo, 
-      contactNumber: req.body.contactNumber, 
-      email: req.body.email, 
-      creationDate: req.body.creationDate, 
+      name: req.body.name,
+      insuranceCompany: req.body.insuranceCompany,
+      policyNumber: req.body.policyNumber,
+      coverageInfo: req.body.coverageInfo,
+      contactNumber: req.body.contactNumber,
+      email: req.body.email,
+      creationDate: req.body.creationDate,
       renewalDate: req.body.renewalDate
     }
 
@@ -120,7 +120,7 @@ const updateCoverage = async (req, res, next) => {
 
     // Update coverage record with coverageObj data
     const coverage = await collection
-      .replaceOne({ _id: new ObjectId(coverageId)}, coverageObj);
+      .replaceOne({ _id: new ObjectId(coverageId) }, coverageObj);
 
     // Update successful
     if (coverage.modifiedCount > 0) {
@@ -148,7 +148,7 @@ const deleteCoverage = async (req, res, next) => {
 
     // Check to see if id is valid
     if (!ObjectId.isValid(id)) {
-      return res.status(400).json({ error: "Please use a valid id."});
+      return res.status(400).json({ error: "Please use a valid id." });
     }
 
     // Access the coverage collection
@@ -159,12 +159,12 @@ const deleteCoverage = async (req, res, next) => {
     // Check to see if coverage was deleted
     if (result.deletedCount > 0) {
       // Successful response
-      res.status(200).json({ message: "Insurance coverage successfully deleted."});
+      res.status(200).json({ message: "Insurance coverage successfully deleted." });
     } else {
-      res.status(404).json({ error: "Insurance coverage not found."}); 
+      res.status(404).json({ error: "Insurance coverage not found." });
     }
   } catch (error) {
-    res.status(500).json({ error: "Failed to delete record."});
+    res.status(500).json({ error: "Failed to delete record." });
   }
 }
 

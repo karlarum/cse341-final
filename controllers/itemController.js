@@ -77,7 +77,7 @@ const updateItem = async (req, res) => {
   try {
     const db = getDb();
     const response = await db.collection("item").updateOne(
-      { _id: new ObjectId(itemId) }, 
+      { _id: new ObjectId(itemId) },
       { $set: updatedItem }
     );
 
