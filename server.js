@@ -34,5 +34,5 @@ app
 mongoDB.connectDb();
 
 app.listen(process.env.PORT || port, () => {
-  console.log("Web Server is listening at port " + (process.env.PORT || port));
+  console.log("Web Server is running on http://localhost:" + (process.env.PORT || port));
 });
