@@ -1,5 +1,6 @@
 // Import connectDb to initialize the database
 const { connectDb, getDb } = require("../database/connect");
+
 // Import Supertest HTTP library
 const request = require("supertest");
 // Import the express library
@@ -200,7 +201,7 @@ describe("Tests for /coverage routes", () => {
   
   beforeEach(async () => {
     const db = getDb();
-    console.log("DBNAME BEFOREEACH: ", db.databaseName);
+    // console.log("DBNAME BEFOREEACH: ", db.databaseName);
     // Clear the collection before adding data
     await db.collection("coverage").deleteMany({});
 
@@ -267,9 +268,9 @@ describe("Tests for /coverage routes", () => {
   // Clear all database collections after each test
   afterEach(async () => {
     const db = getDb();
-    console.log("DBNAME AFTEREACH: ", db.databaseName);
+    // console.log("DBNAME AFTEREACH: ", db.databaseName);
     const allDocs = await db.collection("coverage").find().toArray();
-    console.log("Documents before clearing:", allDocs);
+    // console.log("Documents before clearing:", allDocs);
     await db.collection("coverage").deleteMany({});
     jest.clearAllTimers();
   });
@@ -358,7 +359,7 @@ describe("Tests for /coverage routes", () => {
 
     // Store the id of new record
     lastResult = res.body.id;
-    console.log("NEW RECORD ID: ", lastResult);
+    // console.log("NEW RECORD ID: ", lastResult);
 
     expect(res.statusCode).toBe(201);
     expect(res.body).toMatchObject({
@@ -427,7 +428,7 @@ describe("Tests for /coverage routes", () => {
       // .put("/coverage/c4bbbd477893a92451bdf7d3")
       .put(`/coverage/${idToUpdate}`)
       .send(updateBus);
-      console.log("RESPONSE: ", res.body);
+      // console.log("RESPONSE: ", res.body);
 
       expect(res.statusCode).toBe(200);
       expect(res.body).toMatchObject({ 
@@ -437,7 +438,7 @@ describe("Tests for /coverage routes", () => {
     // Confirm the record was updated in the database
     const chkBus = await db.collection("coverage")
       .findOne({ _id: new ObjectId(idToUpdate) })
-    console.log("UPDATED RECORD: ", chkBus);
+    // console.log("UPDATED RECORD: ", chkBus);
 
     expect(chkBus).toMatchObject(updateBus);
   });
@@ -531,30 +532,139 @@ describe("Tests for /coverage routes", () => {
 //   });
 // })
 
-describe("Test controllers for 500 response", () => {
-  // let spyConsoleErr;
+describe("Test getAllCoverage for error responses", () => {
+  let spyConsoleErr;
 
   beforeEach(() => {
     // Mock console.error to track its calls
-    // spyConsoleErr = jest.spyOn(console, "error").mockImplementation();
-  });
+    spyConsoleErr = jest.spyOn(console, "error").mockImplementation();
 
-  afterEach(() => {
-    // Restore mocks
-    jest.clearAllMocks();
-    // spyConsoleErr.mockRestore();
-    // Remove mock so other tests are not affected
-    jest.unmock("../database/connect");
-  });
+    // Resets the module registry
+    jest.resetModules();
 
-  test("Should return 500 if getCoverageById fails", async () => {
     // Mock causes mongodb.getDb to throw an error
     jest.mock("../database/connect", () => ({
       getDb: jest.fn(() => {
         throw new Error("Failed to connect to MongoDB.");
       }),
     }));
+  });
 
+  afterEach(() => {
+    /* Prevent mock from being applied automatically, but won't retroactively remove mock if it has been loaded. */
+    jest.unmock("../database/connect");
+    // Resets the module registry
+    jest.resetModules();
+    // Clears mock call history, doesn't restore module state
+    jest.clearAllMocks();
+    
+    // 
+    spyConsoleErr.mockRestore();
+  });
+
+  test("Should return 500 if getAllCoverage fails", async () => {
+    const { getAllCoverage } = require("../src/controllers/coverageController");
+
+    // Mock Express req and res objects
+    const req = {};
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    // Call the function with the mocked req/res values
+    await getAllCoverage(req, res);
+
+    // Test that res.status is called with 500
+    expect(res.status).toHaveBeenCalledWith(500);
+    // Test that res.json is called with correct message
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Failed to get records.",
+    });
+
+    // Verify that console.error was called
+    expect(spyConsoleErr).toHaveBeenCalledWith(
+      expect.stringContaining("Error getting all coverages: "),
+      expect.any(Error)
+    );
+  });
+});
+
+describe("Test getAllCoverage for getDb failure 500", () => {
+  let spyConsoleErr;
+
+  beforeEach(() => {
+    // Mock console.error to track its calls
+    spyConsoleErr = jest.spyOn(console, "error").mockImplementation();
+    // Reset the module registry
+    jest.resetModules();
+
+    // Mock causes mongodb.getDb to return null
+    jest.mock("../database/connect", () => ({
+      // getDb returns null, simulates db connection failure
+      getDb: jest.fn(() => null),  
+    }));
+  });
+
+  afterEach(() => {
+    /* Prevent mock from being applied automatically, but won't retroactively remove mock if it has been loaded. */
+    jest.unmock("../database/connect");
+    // Resets the module registry
+    jest.resetModules();
+    // Clears mock call history, doesn't restore module state
+    jest.clearAllMocks();
+    
+    // 
+    spyConsoleErr.mockRestore();
+  });
+
+  test("Should return 500 if getDb fails in getAllCoverage", async () => {
+    const { getAllCoverage } = require("../src/controllers/coverageController");
+
+    // Mock Express req and res objects
+    const req = {};
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    // Call the function with the mocked req/res values
+    await getAllCoverage(req, res);
+
+    // Test that res.status is called with 500
+    expect(res.status).toHaveBeenCalledWith(500);
+    // Test that res.json is called with correct message
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Database connection failed.",
+    });
+
+    // Verify that console.error was called
+    expect(spyConsoleErr).toHaveBeenCalledWith(
+      expect.stringContaining("Database connection is null or undefined.")
+    );
+  });
+});
+
+describe("Test controllers for 500 response", () => {
+  beforeEach(() => {
+    // Mock causes mongodb.getDb to throw an error
+    jest.mock("../database/connect", () => ({
+      getDb: jest.fn(() => {
+        throw new Error("Failed to connect to MongoDB.");
+      }),
+    }));
+  });
+  
+  afterEach(() => {
+    // Restore mocks
+    jest.clearAllMocks();
+    // Remove mock so other tests are not affected
+    jest.unmock("../database/connect");
+    // Reset mocks
+    jest.resetModules();
+  });
+
+  test("Should return 500 if getCoverageById fails", async () => {
     const { getCoverageById } = require("../src/controllers/coverageController");
 
     // Mock Express req and res objects
@@ -578,22 +688,9 @@ describe("Test controllers for 500 response", () => {
     expect(res.json).toHaveBeenCalledWith({
       error: "An error occurred while fetching data.",
     });
-
-    // Verify that console.error was called
-    // expect(spyConsoleErr).toHaveBeenCalledWith(
-    //   expect.stringContaining("Failed to connect to MongoDB"),
-    //   expect.any(Error)
-    // );
   });
 
   test("Should return 500 if createCoverage fails", async () => {
-    // Mock causes mongodb.getDb to throw an error
-    jest.mock("../database/connect", () => ({
-      getDb: jest.fn(() => {
-        throw new Error("Failed to connect to MongoDB.");
-      }),
-    }));
-
     const { createCoverage } = require("../src/controllers/coverageController");
 
     // Mock Express req and res objects
@@ -615,17 +712,10 @@ describe("Test controllers for 500 response", () => {
   });
 
   test("Should return 500 if updateCoverage fails", async () => {
-    // Mock causes mongodb.getDb to throw an error
-    jest.mock("../database/connect", () => ({
-      getDb: jest.fn(() => {
-        throw new Error("Failed to connect to MongoDB.");
-      }),
-    }));
-
     const { updateCoverage } = require("../src/controllers/coverageController");
 
     // Mock Express req and res objects
-    const req = {};
+    const req = { params: { id: "6759d95c78b34f58d00456ba" } };
     const res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
@@ -643,17 +733,10 @@ describe("Test controllers for 500 response", () => {
   });
 
   test("Should return 500 if deleteCoverage fails", async () => {
-    // Mock causes mongodb.getDb to throw an error
-    jest.mock("../database/connect", () => ({
-      getDb: jest.fn(() => {
-        throw new Error("Failed to connect to MongoDB.");
-      }),
-    }));
-
     const { deleteCoverage } = require("../src/controllers/coverageController");
 
     // Mock Express req and res objects
-    const req = {};
+    const req = { params: { id: "6759d95c78b34f58d00456ba" } };
     const res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
@@ -671,13 +754,293 @@ describe("Test controllers for 500 response", () => {
   });
 });
 
-// describe("Tests for createCoverage function", () => {
-//   afterEach(() => {
-//     // Restore mocks
-//     jest.clearAllMocks();
-//     // Remove mock so other tests are not affected
-//     jest.unmock("../database/connect");
-//   });
+describe("Tests coverage controllers for valid ObjectId", () => {  
+  afterEach(() => {
+    // Restore mocks
+    jest.clearAllMocks();
+    // Remove mock so other tests are not affected
+    jest.unmock("../database/connect");
+    jest.resetModules();
+  });
 
+  test("Should return 400 if update ObjectID is invalid", async () => {
+    // Mock Express req and res objects
+    const req = {
+      params: {
+        // Mock valid ObjectId
+        id: null, 
+      }, 
+      body: {
+        name: "Coverage Z",
+        insuranceCompany: "Company Z",
+        policyNumber: "999999",
+        coverageInfo: "testZ", 
+        contactNumber: "555-555-9999", 
+        email: "testZ@example.com", 
+        creationDate: "0000-00-09", 
+        renewalDate: "0001-00-09"
+      }
+    };
+    
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    const { updateCoverage } = require("../src/controllers/coverageController");
+    
+    // Call the function with the mocked req/res values
+    await updateCoverage(req, res);
   
-// });
+    // Verify that the invalid ID is handled correctly
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Please use a valid ID.",
+    });
+  });
+
+  test("Should return 400 if delete ObjectID is invalid", async () => {
+    // Mock database to avoid interference with other tests
+    // jest.mock("../database/connect", () => ({
+    //   getDb: jest.fn(() => ({
+    //     collection: jest.fn(() => ({
+    //       deleteOne: jest.fn(),
+    //     })),
+    //   })),
+    // }));
+  
+    // const invalidId = "invalid-id";
+    // // Call the API endpoint
+    // const res = await request(app).delete(`/coverage/${invalidId}`);
+
+    // Mock Express req and res objects
+    const req = {
+      params: {
+        // Mock valid ObjectId
+        id: null, 
+      },
+    };
+    
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    const { deleteCoverage } = require("../src/controllers/coverageController");
+
+    // Call the function with the mocked req/res values
+    await deleteCoverage(req, res);
+  
+    // Verify that the invalid ID is handled correctly
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Please use a valid id.",
+    });
+  });
+});
+
+describe("Tests deleteCoverage controller for valid record not in database", () => {
+  let connection;
+  let db;
+
+  /* Set up connection to MongoDB. The global var __MONGO_URI__ is provided by in-memory MongoDB setup. */
+  beforeAll(async () => {
+    connection = await MongoClient.connect(global.__MONGO_URI__);
+    // Connect to team database explicitly
+    db = await connection.db("team");
+
+    jest.mock('../database/connect', () => ({
+      getDb: jest.fn().mockReturnValue({
+        collection: jest.fn().mockReturnValue({
+          deleteOne: jest.fn().mockResolvedValue({ deletedCount: 0 })
+        })
+      })
+    }));
+  });
+
+  /* Closes db connection, frees up resources, prevents memory leaks. */
+  afterAll(async () => {
+    await connection.close();
+    jest.clearAllMocks(); // Clear any mock behavior
+  });
+
+  afterEach(() => {
+    // Restore mocks
+    jest.clearAllMocks();
+    // Remove mock so other tests are not affected
+    jest.unmock("../database/connect");
+    jest.resetModules();
+  });
+
+  test("Should return 404 if record does not exist when deleting coverage", async () => {
+    // Mock Express req and res objects
+    const req = {
+      params: {
+        // Mock valid ObjectId
+        id: "6759f2d2b7aaf3eb2152c14b", 
+      }, 
+      body: {
+        name: "Coverage G",
+        insuranceCompany: "Company G",
+        policyNumber: "000007",
+        coverageInfo: "testG",
+        contactNumber: "555-555-5557",
+        email: "testG@example.com",
+        creationDate: "0000-00-07",
+        renewalDate: "0002-00-07"
+      }, 
+    };
+    
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    const { deleteCoverage } = require("../src/controllers/coverageController");
+
+    // Call the function with the mocked req/res values
+    await deleteCoverage(req, res);
+  
+    // Verify that the invalid ID is handled correctly
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Insurance coverage not found.",
+    });
+  });
+});
+
+describe("Tests updateCoverage controller for valid record not in database", () => {
+  let connection;
+  let db;
+
+  /* Set up connection to MongoDB. The global var __MONGO_URI__ is provided by in-memory MongoDB setup. */
+  beforeAll(async () => {
+    connection = await MongoClient.connect(global.__MONGO_URI__);
+    // Connect to team database explicitly
+    db = await connection.db("team");
+
+    jest.mock('../database/connect', () => ({
+      getDb: jest.fn().mockReturnValue({
+        collection: jest.fn().mockReturnValue({
+          replaceOne: jest.fn().mockResolvedValue({ modifiedCount: 0 })
+        })
+      })
+    }));
+  });
+
+  /* Closes db connection, frees up resources, prevents memory leaks. */
+  afterAll(async () => {
+    await connection.close();
+    jest.clearAllMocks(); // Clear any mock behavior
+  });
+
+  afterEach(() => {
+    // Restore mocks
+    jest.clearAllMocks();
+    // Remove mock so other tests are not affected
+    jest.unmock("../database/connect");
+    jest.resetModules();
+  });
+
+  test("Should return 404 if record does not exist when updating coverage", async () => {
+    // Mock Express req and res objects
+    const req = {
+      params: {
+        // Mock valid ObjectId
+        id: "6759f2d2b7aaf3eb2152c14b", 
+      }, 
+      body: {
+        name: "Coverage G",
+        insuranceCompany: "Company G",
+        policyNumber: "000007",
+        coverageInfo: "testG",
+        contactNumber: "555-555-5557",
+        email: "testG@example.com",
+        creationDate: "0000-00-07",
+        renewalDate: "0002-00-07"
+      }, 
+    };
+    
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    const { updateCoverage } = require("../src/controllers/coverageController");
+
+    // Call the function with the mocked req/res values
+    await updateCoverage(req, res);
+  
+    // Verify that the invalid ID is handled correctly
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "No coverage found with the given ID.",
+    });
+  });
+});
+
+describe("Tests createCoverage controller for validity", () => {
+  let connection;
+  let db;
+
+  /* Set up connection to MongoDB. The global var __MONGO_URI__ is provided by in-memory MongoDB setup. */
+  beforeAll(async () => {
+    connection = await MongoClient.connect(global.__MONGO_URI__);
+    // Connect to team database explicitly
+    db = await connection.db("team");
+
+    jest.mock('../database/connect', () => ({
+      getDb: jest.fn().mockReturnValue({
+        collection: jest.fn().mockReturnValue({
+          insertOne: jest.fn().mockResolvedValue({ insertedId: null })
+        })
+      })
+    }));
+  });
+
+  /* Closes db connection, frees up resources, prevents memory leaks. */
+  afterAll(async () => {
+    await connection.close();
+    jest.clearAllMocks(); // Clear any mock behavior
+  });
+
+  afterEach(() => {
+    // Restore mocks
+    jest.clearAllMocks();
+    // Remove mock so other tests are not affected
+    jest.unmock("../database/connect");
+    jest.resetModules();
+  });
+
+  test("Should return 400 if record does not exist when creating coverage", async () => {
+    // Mock Express req and res objects
+    const req = { 
+      body: {
+        name: "Coverage G",
+        insuranceCompany: "Company G",
+        policyNumber: "000007",
+        coverageInfo: "testG",
+        contactNumber: "555-555-5557",
+        email: "testG@example.com",
+        creationDate: "0000-00-07",
+        renewalDate: "0002-00-07"
+      }, 
+    };
+    
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    const { createCoverage } = require("../src/controllers/coverageController");
+
+    // Call the function with the mocked req/res values
+    await createCoverage(req, res);
+  
+    // Verify that the invalid ID is handled correctly
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Bad request: An error occurred while creating record.",
+    });
+  });
+});

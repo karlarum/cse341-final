@@ -19,8 +19,8 @@ const getAllCoverage = async (req, res, next) => {
     // HTTP successful response with coverage data
     res.status(200).json(coverage);
   } catch (error) {
-    console.error("Error getting all coverages: ", error);
     res.status(500).json({ error: "Failed to get records." });
+    console.error("Error getting all coverages: ", error);
   }
 }
 
@@ -28,28 +28,19 @@ const getCoverageById = async (req, res, next) => {
   try {
     // // Get reference to db
     const db = mongodb.getDb();
-    console.log("RAN GETDB FUNCTION");
-    // Convert id into Mongo ObjectId
+    
+    /* Convert id into Mongo ObjectId, new ObjectId implies req.params.id is valid. If invalid, throw catch error */
     const coverageId = new ObjectId(req.params.id);
-    console.log("CREATED NEW MONGODB OBJECT ID");
-
-    // Run a check to see if the ID is valid
-    if (!ObjectId.isValid(coverageId)) {
-      console.log("MONGODB OBJECTID INVALID");
-      return res.status(400).json({ error: "Please use a valid ID." });
-    }
 
     // Search for coverage with matching id
     const coverage = await db
       .collection("coverage")
       .findOne({ _id: coverageId });
-    console.log("COVERAGE COLLECTION ID MATCHED");
 
     if (!coverage) {
-      console.log("COVERAGE COLLECTION ID NOT MATCHED");
       return res.status(404).json({ error: "Search failed. No record found."});
     }
-    console.log("RECEIVED SUCCESSFUL RESPONSE FROM COVERAGE");
+
     // Successful response
     res.status(200).json(coverage);
   } catch (error) {
@@ -72,11 +63,12 @@ const createCoverage = async (req, res, next) => {
 
     // get the MongoDB database instance
     const db = mongodb.getDb();
+    // console.log("*****COLLECTION ACKNOWLEDGED*****", db.collection);
     // Add the formData to "coverage" collection
     const coverage = await db
       .collection("coverage")
       .insertOne(coverageObj);
-
+    // console.log("*****COVERAGE ACKNOWLEDGED*****", coverage);
     // Successful response
     if (coverage.acknowledged) {
       res.status(201).json({ 
@@ -97,16 +89,19 @@ const createCoverage = async (req, res, next) => {
 }
 
 const updateCoverage = async (req, res, next) => {
+  // Convert id into Mongo ObjectId
+  const coverageId = req.params.id;
+
+  // Run a check to see if the ID is valid
+  if (!ObjectId.isValid(coverageId)) {
+    return res.status(400).json({ error: "Please use a valid ID." });
+  }
+  
   try {
     // Get reference to db
     const db = mongodb.getDb();
-    // Convert id into Mongo ObjectId
-    const coverageId = req.params.id;
 
-    // Run a check to see if the ID is valid
-    if (!ObjectId.isValid(coverageId)) {
-      return res.status(422).json({ error: "Please use a valid ID." });
-    }
+    
 
     // Coverage obejct values fetched from body
     const coverageObj = {
@@ -121,19 +116,19 @@ const updateCoverage = async (req, res, next) => {
     }
 
     // Access coverage collection
-    const record = await db
-      .collection("coverage")
-      .findOne({ _id: new ObjectId(coverageId) });
+    // const record = await db
+    //   .collection("coverage")
+    //   .findOne({ _id: new ObjectId(coverageId) });
 
-    // Return error is coverage record not found
-    if (!record) {
-      return res.status(404).json({ error: "Insurance coverage not found." });
-    }
+    // // Return error is coverage record not found
+    // if (!record) {
+    //   return res.status(404).json({ error: "Insurance coverage not found." });
+    // }
 
     // Update coverage record with coverageObj data
     const coverage = await db.collection("coverage")
       .replaceOne({ _id: new ObjectId(coverageId) }, coverageObj);
-
+    // console.log("*****MODIFIED COUNT*****", coverage);
     // Update successful
     if (coverage.modifiedCount > 0) {
       res.status(200).json({
@@ -147,21 +142,26 @@ const updateCoverage = async (req, res, next) => {
     }
   } catch (error) {
     // Internal server error
+    // console.error("Error updating coverage:", error);
     res.status(500).json({ error: "Failed to update record." });
   }
 }
 
 const deleteCoverage = async (req, res, next) => {
+  // Convert id into Mongo ObjectId
+  const id = req.params.id;
+
+  // Check to see if id is valid
+  if (!ObjectId.isValid(id)) {
+    return res.status(400).json({ error: "Please use a valid id."});
+  }
+
   try {
     // Get reference to db
     const db = mongodb.getDb();
-    // Convert id into Mongo ObjectId
-    const id = req.params.id;
-
-    // Check to see if id is valid
-    if (!ObjectId.isValid(id)) {
-      return res.status(400).json({ error: "Please use a valid id."});
-    }
+    
+    // console.log("***** FUNCTION CALLED BY TEST *****: ", expect.getState().currentTestName);
+    // console.log("***** ID *****: ", id);
 
     // Access the coverage collection
     const result = await db
@@ -176,6 +176,7 @@ const deleteCoverage = async (req, res, next) => {
       res.status(404).json({ error: "Insurance coverage not found."}); 
     }
   } catch (error) {
+    // console.error("Error deleting coverage:", error);
     res.status(500).json({ error: "Failed to delete record."});
   }
 }
