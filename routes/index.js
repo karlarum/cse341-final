@@ -5,7 +5,7 @@ const router = require("express").Router();
 router.use("/", require("./swagger"));
 
 // Import session validation middleware
-const { ensureAuthenticated } = require('./session');
+const { ensureAuthenticated } = require('../src/session');
 
 // Set up other routes 
 router.use("/category", ensureAuthenticated, require("./catergoryRoutes"));
