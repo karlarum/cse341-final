@@ -14,7 +14,7 @@ const getAllCoverage = async (req, res, next) => {
     // Get records in coverage collection
     const coverage = await db.collection("coverage").find().toArray();
     // Log the results of the find query
-    console.log("Coverage records retrieved:", coverage);
+    // console.log("Coverage records retrieved:", coverage);
 
     // HTTP successful response with coverage data
     res.status(200).json(coverage);

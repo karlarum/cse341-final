@@ -14,7 +14,7 @@ const getCategories = async (req, res) => {
     // Respond with the fetched Categorys
     res.status(200).json(categories);
   } catch (error) {
-    console.error("Error fetching Categories:", error);
+    // console.error("Error fetching Categories:", error);
     res.status(500).json({ error: "Failed to fetch Categories" });
   }
 };
@@ -38,7 +38,7 @@ const getCategoryById = async (req, res) => {
 
     res.status(200).json(category);
   } catch (error) {
-    console.error("Error fetching Category:", error);
+    // console.error("Error fetching Category:", error);
     res.status(500).json({ error: "Failed to fetch Category" });
   }
 };

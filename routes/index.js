@@ -12,7 +12,7 @@ const { ensureAuthenticated } = require('../src/session');
 router.use("/category", require("./category"));
 router.use("/item", require("./itemRoutes"));
 router.use("/user", require("./userRoutes"));
-router.use("/coverage", require("./coverageRoutes"));
+// router.use("/coverage", require("./coverageRoutes"));
 // router.use("/category", ensureAuthenticated, require("./catergoryRoutes"));
 // router.use("/item", ensureAuthenticated, require("./itemRoutes"));
 // router.use("/user", require("./userRoutes"));
