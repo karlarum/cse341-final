@@ -122,7 +122,7 @@ Content-Type: application/json
 
 ### Get user information
 GET http://localhost:3000/user/ethansglenn
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NWI3ODJlZmQzNjE2MTFkMDkxNjNjNiIsInVzZXJuYW1lIjoiZXRoYW5zZ2xlbm4iLCJpYXQiOjE3MzQwNDkwOTcsImV4cCI6MTczNDA1NjI5N30.f9hw1rTvl8j-t5VFueRr0g-X2g3UJl0TccilXWna4EE
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NWI5NWNhODJkZWZmNDZjMDdiODllMSIsInVzZXJuYW1lIjoiZXRoYW5zZ2xlbm4iLCJpYXQiOjE3MzQwNTU1MjQsImV4cCI6MTczNDA2MjcyNH0.kTalV3WfiqUaw60qSahQQW7LUqavzhr7-2Qew0y_Zwg
 
 ### Update user information
 PUT http://localhost:3000/user/ethansglenn
@@ -144,4 +144,4 @@ Content-Type: application/json
 
 ### Delete a user
 DELETE http://localhost:3000/user/ethansglenn
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NWI3ODJlZmQzNjE2MTFkMDkxNjNjNiIsInVzZXJuYW1lIjoiZXRoYW5zZ2xlbm4iLCJpYXQiOjE3MzQwNDkwOTcsImV4cCI6MTczNDA1NjI5N30.f9hw1rTvl8j-t5VFueRr0g-X2g3UJl0TccilXWna4EE
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NWI5NWNhODJkZWZmNDZjMDdiODllMSIsInVzZXJuYW1lIjoiZXRoYW5zZ2xlbm4iLCJpYXQiOjE3MzQwNTU1MjQsImV4cCI6MTczNDA2MjcyNH0.kTalV3WfiqUaw60qSahQQW7LUqavzhr7-2Qew0y_Zwg
