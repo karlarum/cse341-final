@@ -1,0 +1,892 @@
+{
+  "swagger": "2.0", 
+  "info": {
+    "title": "CSE-341 Final", 
+    "description": "Home Inventory Manager", 
+    "version": "1.0.0"
+  }, 
+  "host": "localhost:3000", 
+  "basePath": "/", 
+  "schemes": [ 
+    "http"
+  ], 
+  "securityDefinitions": {
+
+  }, 
+  "paths": {
+    "/api-docs": {
+      "get": {
+        "description": "Fetch API documentation", 
+        "responses": {
+          "default": {
+            "description": "Default response"
+          }
+        }
+      }
+    }, 
+    "/item/": {
+      "get": {
+        "description": "Get all items.", 
+        "produces": [
+          "application/json"
+        ], 
+        "responses": {
+          "200": {
+            "description": "OK"
+          }, 
+          "400": {
+            "description": "Bad Request"
+          }, 
+          "404": {
+            "description": "No items found"
+          },
+          "500": {
+            "description": "Internal Service Error"
+          }
+        }
+      }, 
+      "post": {
+        "description": "add new item", 
+        "produces": [
+          "application/json"
+        ], 
+        "parameters": [ 
+          {
+            "in": "body", 
+            "name": "body", 
+            "required": true, 
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "example": "name of item"
+                }, 
+                "userId": {
+                  "example": "reference to the id of homeowner who owns the item"
+                }, 
+                "categoryId": {
+                  "example": "id reference to item's category"
+                }, 
+                "coverageId": {
+                  "example": "id reference to insurance plan item is covered under"
+                }, 
+                "purchaseDate": {
+                  "example": "date the item was purchased"
+                },
+                "purchasePrice": {
+                  "example": "original price of the item"
+                }, 
+                "description": {
+                  "example": "description of the item"
+                }
+              }
+            }
+          }
+        ], 
+        "responses": {
+          "201": {
+            "description": "Item created successfully."
+          }, 
+          "400": {
+            "description": "Bad Request"
+          }, 
+          "500": {
+            "description": "Internal Service Error"
+          }
+        }
+      }
+    }, 
+    "/item/findByCategory": {
+      "get": {
+        "description": "Get all items by category.", 
+        "produces": [
+          "application/json"
+        ], 
+        "parameters": [
+          {
+            "name": "category", 
+            "in": "path", 
+            "required": true, 
+            "type": "string"
+          }
+        ], 
+        "responses": {
+          "200": {
+            "description": "OK"
+          }, 
+          "400": {
+            "description": "Bad Request"
+          }, 
+          "404": {
+            "description": "No item found in category"
+          },
+          "500": {
+            "description": "Internal Service Error"
+          }
+        }
+      }
+    }, 
+    "/item/{id}": {
+      "get": {
+        "description": "Get item by id", 
+        "produces": [
+          "application/json"
+        ], 
+        "parameters": [
+          {
+            "name": "id", 
+            "in": "path", 
+            "required": true, 
+            "type": "string"
+          }
+        ], 
+        "responses": {
+          "200": {
+            "description": "OK"
+          }, 
+          "400": {
+            "description": "Bad Request"
+          }, 
+          "404": {
+            "description": "Item not found"
+          },
+          "500": {
+            "description": "Internal Service Error"
+          }
+        }
+      }, 
+      "put": {
+        "description": "Add new item.", 
+        "produces": [
+          "application/json"
+        ], 
+        "parameters": [
+          {
+            "name": "id", 
+            "in": "path", 
+            "required": true, 
+            "type": "string"
+          }, 
+          {
+            "in": "body", 
+            "name": "body", 
+            "required": true, 
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "example": "name of item"
+                }, 
+                "userId": {
+                  "example": "reference to the id of homeowner who owns the item"
+                }, 
+                "categoryId": {
+                  "example": "id reference to item's category"
+                }, 
+                "coverageId": {
+                  "example": "id reference to insurance plan item is covered under"
+                }, 
+                "purchaseDate": {
+                  "example": "date the item was purchased"
+                },
+                "purchasePrice": {
+                  "example": "original price of the item"
+                }, 
+                "description": {
+                  "example": "description of the item"
+                }
+              }
+            }
+          }
+        ], 
+        "responses": {
+          "200": {
+            "description": "OK"
+          }, 
+          "400": {
+            "description": "Bad Request"
+          }, 
+          "404": {
+            "description": "Item not found."
+          }, 
+          "500": {
+            "description": "Internal Service Error"
+          }
+        }
+      }, 
+      "delete": {
+        "description": "delete an item", 
+        "produces": [
+          "application/json"
+        ], 
+        "parameters": [
+          {
+            "name": "id", 
+            "in": "path", 
+            "required": true, 
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    }, 
+    "/item/{id}/uploadImages": {
+      "post": {
+        "description": "Add images of item",  
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "id", 
+            "in": "path", 
+            "required": true, 
+            "description": "ID of item that image is being uploaded to.", 
+            "type": "string"
+          },
+          {
+            "name": "images", 
+            "in": "formData", 
+            "description": "Image file(s) to be uploaded", 
+            "required": true, 
+            "type": "array", 
+            "items": {
+              "type": "file"
+            }
+          }
+        ], 
+        "responses": {
+          "200": {
+            "description": "OK"
+          }, 
+          "400": {
+            "description": "Bad Request"
+          }, 
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal Service Error"
+          }
+        }
+      }
+    }, 
+    "/user": {
+      "post": {
+        "description": "Add new user.", 
+        "produces": [
+          "application/json"
+        ], 
+        "parameters": [
+          {
+            "in": "body", 
+            "name": "body", 
+            "required": true, 
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "example": "user's login name"
+                }, 
+                "password": {
+                  "example": "user's password"
+                }, 
+                "firstName": {
+                  "example": "user's first name"
+                }, 
+                "lastName": {
+                  "example": "user's last name"
+                }, 
+                "email": {
+                  "example": "user's email address"
+                },
+                "phone": {
+                  "example": "user's phone number"
+                }, 
+                "address": {
+                  "example": "user's home address"
+                }, 
+                "city": {
+                  "example": "user's city"
+                }, 
+                "state": {
+                  "example": "user's state"
+                }, 
+                "zip": {
+                  "example": "user's zip code"
+                }
+              }
+            }
+          }
+        ], 
+        "responses": {
+          "201": {
+            "description": "User created successfully."
+          }, 
+          "400": {
+            "description": "Bad Request"
+          }, 
+          "500": {
+            "description": "Internal Service Error"
+          }
+        }
+      }
+    }, 
+    "/user/login": {
+      "post": {
+        "description": "Authenticate the user and return a token.", 
+        "produces": [
+          "application/json"
+        ], 
+        "parameters": [
+          {
+            "in": "body", 
+            "name": "body", 
+            "required": true, 
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "example": "user's login name"
+                }, 
+                "password": {
+                  "example": "user's password"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful login",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid username or password"
+          }
+        }
+      }
+    }, 
+    "/user/logout": {
+      "post": {
+        "description": "Log out user and terminate session token.",  
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token for the authenticated user",
+            "required": true,
+            "type": "string",
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully logged out",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "User has logged out successfully."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing token."
+          }
+        }, 
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    }, 
+    "/user/{username}": {
+      "get": {
+        "description": "get user info by username", 
+        "produces": [
+          "application/json"
+        ], 
+        "parameters": [
+          {
+            "name": "username", 
+            "in": "path", 
+            "required": true, 
+            "type": "string"
+          }
+        ], 
+        "responses": {
+          "200": {
+            "description": "OK"
+          }, 
+          "400": {
+            "description": "Bad Request"
+          }, 
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal Service Error"
+          }
+        }
+      }, 
+      "put": {
+        "description": "Update user.", 
+        "produces": [
+          "application/json"
+        ], 
+        "parameters": [
+          {
+            "name": "username", 
+            "in": "path", 
+            "required": true, 
+            "type": "string"
+          }, 
+          {
+            "in": "body", 
+            "name": "body", 
+            "required": true, 
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "example": "user's login name"
+                }, 
+                "password": {
+                  "example": "user's password"
+                }, 
+                "firstName": {
+                  "example": "user's first name"
+                }, 
+                "lastName": {
+                  "example": "user's last name"
+                }, 
+                "email": {
+                  "example": "user's email address"
+                },
+                "phone": {
+                  "example": "user's phone number"
+                }, 
+                "address": {
+                  "example": "user's home address"
+                }, 
+                "city": {
+                  "example": "user's city"
+                }, 
+                "state": {
+                  "example": "user's state"
+                }, 
+                "zip": {
+                  "example": "user's zip code"
+                }
+              }
+            }
+          }
+        ], 
+        "responses": {
+          "200": {
+            "description": "OK"
+          }, 
+          "400": {
+            "description": "Bad Request"
+          }, 
+          "404": {
+            "description": "User not found."
+          }, 
+          "500": {
+            "description": "Internal Service Error"
+          }
+        }
+      }, 
+      "delete": {
+        "description": "delete the user's account", 
+        "parameters": [
+          {
+            "name": "username", 
+            "in": "path", 
+            "required": true, 
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/category/": {
+      "get": {
+        "description": "Get all categories.", 
+        "produces": [
+          "application/json"
+        ], 
+        "responses": {
+          "200": {
+            "description": "OK"
+          }, 
+          "400": {
+            "description": "Bad Request"
+          }, 
+          "404": {
+            "description": "No categories found"
+          },
+          "500": {
+            "description": "Internal Service Error"
+          }
+        }
+      }, 
+      "post": {
+        "description": "Add new categories.", 
+        "produces": [
+          "application/json"
+        ], 
+        "parameters": [
+          {
+            "in": "body", 
+            "name": "body", 
+            "required": true, 
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "example": "name of the category"
+                }, 
+                "description": {
+                  "example": "detailed description of items that fit inside this category"
+                }, 
+                "createdDate": {
+                  "example": "date the category was added"
+                },
+                "lastUpdate": {
+                  "example": "date category was last updated"
+                }
+              }
+            }
+          }
+        ], 
+        "responses": {
+          "201": {
+            "description": "Category created successfully."
+          }, 
+          "400": {
+            "description": "Bad Request"
+          }, 
+          "500": {
+            "description": "Internal Service Error"
+          }
+        }
+      }
+    }, 
+    "/category/{id}": {
+      "get": {
+        "description": "Get category by id.",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ], 
+        "responses": {
+          "200": {
+            "description": "OK"
+          }, 
+          "400": {
+            "description": "Bad Request"
+          }, 
+          "404": {
+            "description": "No category found"
+          },
+          "500": {
+            "description": "Internal Service Error"
+          }
+        }
+      },
+      "put": {
+        "description": "Update category by id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "example": "name of the category"
+                }, 
+                "description": {
+                  "example": "detailed description of items that fit inside this category"
+                }, 
+                "createdDate": {
+                  "example": "date the category was added"
+                },
+                "lastUpdate": {
+                  "example": "date category was last updated"
+                }
+              }
+            }
+          }
+        ], 
+        "responses": {
+          "200": {
+            "description": "OK"
+          }, 
+          "400": {
+            "description": "Bad Request"
+          }, 
+          "404": {
+            "description": "Category not found."
+          }, 
+          "500": {
+            "description": "Internal Service Error"
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete category by id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/coverage/": {
+      "get": {
+        "description": "Get all coverages.", 
+        "produces": [
+          "application/json"
+        ], 
+        "responses": {
+          "200": {
+            "description": "OK"
+          }, 
+          "400": {
+            "description": "Bad Request"
+          }, 
+          "404": {
+            "description": "No coverage found"
+          },
+          "500": {
+            "description": "Internal Service Error"
+          }
+        }
+      }, 
+      "post": {
+        "description": "Add new coverage.", 
+        "produces": [
+          "application/json"
+        ], 
+        "parameters": [
+          {
+            "in": "body", 
+            "name": "body", 
+            "required": true, 
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "example": "name the type of coverage"
+                }, 
+                "insuranceCompany": {
+                  "example": "name of insurance provider"
+                }, 
+                "policyNumber": {
+                  "example": "coverage policy number"
+                },
+                "coverageInfo": {
+                  "example": "specifies what the policy covers"
+                },
+                "contactNumber": {
+                  "example": "phone number to contact insurance provider"
+                },
+                "email": {
+                  "example": "email address of insurance provider"
+                },
+                "creationDate": {
+                  "example": "date the coverage was added"
+                },
+                "renewalDate": {
+                  "example": "date the coverage must be renewed or expire"
+                }
+              }
+            }
+          }
+        ], 
+        "responses": {
+          "201": {
+            "description": "Coverage created successfully."
+          }, 
+          "400": {
+            "description": "Bad Request"
+          }, 
+          "500": {
+            "description": "Internal Service Error"
+          }
+        }
+      }
+    }, 
+    "/coverage/{id}": {
+      "get": {
+        "description": "Get coverage by id.",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ], 
+        "responses": {
+          "200": {
+            "description": "OK"
+          }, 
+          "400": {
+            "description": "Bad Request"
+          }, 
+          "404": {
+            "description": "Coverage not found"
+          },
+          "500": {
+            "description": "Internal Service Error"
+          }
+        }
+      },
+      "put": {
+        "description": "Update coverage by id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "example": "name the type of coverage"
+                }, 
+                "insuranceCompany": {
+                  "example": "name of insurance provider"
+                }, 
+                "policyNumber": {
+                  "example": "coverage policy number"
+                },
+                "coverageInfo": {
+                  "example": "specifies what the policy covers"
+                },
+                "contactNumber": {
+                  "example": "phone number to contact insurance provider"
+                },
+                "email": {
+                  "example": "email address of insurance provider"
+                },
+                "creationDate": {
+                  "example": "date the coverage was added"
+                },
+                "renewalDate": {
+                  "example": "date the coverage must be renewed or expire"
+                }
+              }
+            }
+          }
+        ], 
+        "responses": {
+          "200": {
+            "description": "OK"
+          }, 
+          "400": {
+            "description": "Bad Request"
+          }, 
+          "404": {
+            "description": "Coverage not found."
+          }, 
+          "500": {
+            "description": "Internal Service Error"
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete coverage by id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    }
+  }
+}

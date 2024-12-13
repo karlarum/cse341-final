@@ -89,6 +89,13 @@ Content-Type: application/json
     "parent_id": null
 }
 
+### LOCAL COVERAGE REQUESTS ###
+
+### local get all coverages ###
+GET http://localhost:3000/coverage
+
+###
+https://jsonplaceholder.typicode.com/posts/1
 
 # ======= USER ROUTES TESTING =======
 
@@ -145,3 +152,4 @@ Content-Type: application/json
 ### Delete a user
 DELETE http://localhost:3000/user/ethansglenn
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NWI5NWNhODJkZWZmNDZjMDdiODllMSIsInVzZXJuYW1lIjoiZXRoYW5zZ2xlbm4iLCJpYXQiOjE3MzQwNTU1MjQsImV4cCI6MTczNDA2MjcyNH0.kTalV3WfiqUaw60qSahQQW7LUqavzhr7-2Qew0y_Zwg
+

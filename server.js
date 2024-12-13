@@ -31,8 +31,19 @@ app
   .use("/", require("./src/routes"));
 
 // Connect to MongoDB
+// mongoDB.connectDb((error) => {
+//   if (error) {
+//     console.log(error);
+//   } else {
+//     app.listen(process.env.PORT || port, () => {
+//       console.log("Web Server is listening at port " + (process.env.PORT || port));
+//     });
+//   }
+// });
+
+// Connect to MongoDB
 mongoDB.connectDb();
 
 app.listen(process.env.PORT || port, () => {
-  console.log("Web Server is running on http://localhost:" + (process.env.PORT || port));
+  console.log("Web Server is listening at port " + (process.env.PORT || port));
 });

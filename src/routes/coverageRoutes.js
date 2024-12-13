@@ -6,12 +6,15 @@ const routes = express.Router();
 // Import the coverage controller module
 const routeCoverage = require("../controllers/coverageController");
 
+// Import validator controller module
+const { coverageValidation, idValidation, validate } = require("../middleware/validator/validator");
+
 // Set up coverage routes
 routes.get("/", routeCoverage.getAllCoverage);
-routes.get("/:id", routeCoverage.getCoverageById);
-routes.post("/", routeCoverage.createCoverage);
-routes.put("/:id", routeCoverage.updateCoverage);
-routes.delete("/:id", routeCoverage.deleteCoverage);
+routes.get("/:id", idValidation(), validate, routeCoverage.getCoverageById);
+routes.post("/", coverageValidation(), validate, routeCoverage.createCoverage);
+routes.put("/:id", coverageValidation(), validate, routeCoverage.updateCoverage);
+routes.delete("/:id", idValidation(), validate, routeCoverage.deleteCoverage);
 
 // Export the routes object
 module.exports = routes;
