@@ -1,10 +1,22 @@
 const { getDb } = require("../database/connect");
+const jwt = require('jsonwebtoken');
+require("dotenv").config();
+const secretKey = process.env.SECRET_KEY;
+const { decodeAuthToken } = require('../src/session');
 
 const createUser = async (req, res) => {
     const user = {
         username: req.body.username,
         password: req.body.password,
-    };
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email,
+        phone: req.body.phone,
+        address: req.body.address,
+        city: req.body.city,
+        state: req.body.state,
+        zip: req.body.zip,
+    }
 
     try {
         const db = getDb();
@@ -38,9 +50,10 @@ const loginUser = async (req, res) => {
             return res.status(401).json({ error: "Invalid credentials" });
         }
 
+        const token = jwt.sign({ id: user._id, username: user.username }, secretKey, { expiresIn: '2h' });
 
         req.session.user = user;
-        res.status(200).json({ message: "Login successful", user: { username: user.username } });
+        res.status(200).json({ message: "Login successful", user: { username: user.username }, token });
 
     } catch (error) {
         res.status(500).json({ error: "An error occurred: " + error.message });
@@ -69,7 +82,12 @@ const logoutUser = async (req, res) => {
 
 // GET user by username
 const getUserByUsername = async (req, res) => {
-    const username = req.params.username;
+    const searchUsername = req.params.username;
+    const username = req.user.username;
+
+    if (searchUsername !== username) {
+        return res.status(401).json({ error: "Unauthorized: Requesting someone elses data" });
+    }
 
     try {
         const db = getDb();
@@ -91,6 +109,14 @@ const updateUser = async (req, res) => {
     const updatedUserData = {
         username: req.body.username,
         password: req.body.password,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email,
+        phone: req.body.phone,
+        address: req.body.address,
+        city: req.body.city,
+        state: req.body.state,
+        zip: req.body.zip,
     };
 
     try {
@@ -115,7 +141,12 @@ const updateUser = async (req, res) => {
 
 // DELETE user
 const deleteUser = async (req, res) => {
-    const username = req.params.username;
+    const searchUsername = req.params.username;
+    const username = req.user.username;
+
+    if (searchUsername !== username) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
 
     try {
         const db = getDb();
