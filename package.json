@@ -5,6 +5,7 @@
   "scripts": {
     "test": "npx jest --coverage",
     "start": "nodemon server.js",
+    "watch": "node --watch --watch-preserve-output server.js",
     "swagger": "node ./swagger.js"
   },
   "keywords": [],

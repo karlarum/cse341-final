@@ -88,3 +88,11 @@ Content-Type: application/json
     "description": "Devices, gadgets, and tech products.",
     "parent_id": null
 }
+
+### LOCAL COVERAGE REQUESTS ###
+
+### local get all coverages ###
+GET http://localhost:3000/coverage
+
+###
+https://jsonplaceholder.typicode.com/posts/1

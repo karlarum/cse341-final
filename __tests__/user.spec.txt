@@ -1,0 +1,100 @@
+// Import connectDb to initialize the database
+const { connectDb, getDb } = require("../database/connect");
+
+// Import Supertest HTTP library
+const request = require("supertest");
+// Import the express library
+const express = require("express");
+
+/* Import MongoClient class from mongodb library. Allows access to mongodb database. */
+const { MongoClient, ObjectId } = require("mongodb");
+// Import routes index where subroutes are defined
+const routes = require("../routes/index");
+
+// Create instance of express
+const app = express();
+// Parse JSON through req.body
+app.use(express.json());
+// Use routes module for requests to root "/"
+app.use("/", routes);
+
+describe("Tests for connectDb function", () => {
+  afterEach(() => {
+    // Reset mocks and restore the original implementation
+    jest.resetModules();
+  });
+
+  test("Should throw error when client not initialized", async () => {
+    const { connectDb } = require("../database/connect");
+  
+    // Call connectDb with undefined client
+    await expect(connectDb(undefined)).rejects.toThrowError("MongoClient instance is required");
+  });  
+});
+
+describe("Tests for connectDb function", () => {
+  let spyConsoleErr;
+
+  beforeEach(() => {
+    // Mock console.error to track its calls
+    spyConsoleErr = jest.spyOn(console, "error").mockImplementation();
+  });
+
+  afterEach(() => {
+    // Restore the mock after each test
+    jest.clearAllMocks();
+    spyConsoleErr.mockRestore();
+    jest.unmock("mongodb"); // Ensure no lingering mocks
+  });
+
+  test("Should handle MongoClient creation failure", async () => {
+    // Mock case: MongoClient creation fails
+    jest.mock("mongodb", () => {
+      const originalModule = jest.requireActual("mongodb");
+      return {
+        ...originalModule,
+        MongoClient: jest.fn(() => {
+          throw new Error("MongoClient creation failed");
+        }),
+      };
+    });
+
+    const { connectDb } = require("../database/connect");
+
+    await connectDb("team");
+
+    // Verify console.error was called
+    expect(spyConsoleErr).toHaveBeenCalledWith(
+      "Failed to connect to MongoDB",
+      expect.any(Error)
+    );
+  });
+});
+
+describe("Tests for getDb function", () => {
+  afterEach(() => {
+    // Reset mocks and restore the original implementation
+    jest.resetModules();
+  });
+
+  test("Should throw an error when db is not initialized", () => {
+    // Replace db variable with mocked version
+    jest.mock("../database/connect", () => {
+      // Import real mod in connect.js, but replace db
+      const ogModule = jest.requireActual("../database/connect");
+      // ret connect.js exports, replaces db export w/mock db
+      return {
+        ...ogModule,
+      // Replace w/undefined to test when db not initialized
+        db: undefined, // Simulate uninitialized db
+      };
+    });
+
+    // Re-import mocked connect.js module to use undefined db
+    const { getDb } = require("../database/connect");
+    // Call getDb, which throws error because db is undefined
+    expect(() => getDb()).toThrowError(
+      "Database not initialized. Call connectDb first."
+    );
+  });
+});

@@ -7,10 +7,10 @@ const uri = process.env.MONGODB_URI;
 
 let db;
 
-const connectDb = async (clientDb) => {
-  if (!clientDb) {
-    throw new Error("MongoClient instance is required");
-  }
+const connectDb = async () => {
+  // if (!clientDb) {
+  //   throw new Error("MongoClient instance is required");
+  // }
   try {
     const client = new MongoClient(uri);
     await client.connect();
