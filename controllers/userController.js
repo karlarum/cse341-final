@@ -170,6 +170,57 @@ const getSession = (req) => {
     return req.session.user;
 }
 
+const authUserCallback = async ({ query: { code } }, res) => {
+    const body = {
+        client_id: process.env.GITHUB_CLIENT_ID,
+        client_secret: process.env.GITHUB_CLIENT_SECRET,
+        code,
+        redirect_uri: process.env.GITHUB_REDIRECT_URI
+    }
+
+    try {
+        const fetch = (await import('node-fetch')).default;
+
+        const response = await fetch('https://github.com/login/oauth/access_token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json'
+            },
+            body: JSON.stringify(body)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Error:", errorData);
+            return res.status(response.status).json({ message: 'GitHub OAuth Error: ' + errorData.error_description });
+        }
+        const data = response.json();
+        const access_token = data.access_token;
+
+        const userResponse = await fetch('https://api.github.com/user', {
+            headers: {
+                Authorization: `token ${access_token}`
+            }
+        });
+
+        if (!userResponse.ok) {
+            const errorData = await userResponse.json();
+            console.error("Error:", errorData);
+            return res.status(userResponse.status).json({ message: 'GitHub User Error: ' + errorData.message });
+        }
+
+        const user = await userResponse.json();
+        const token = jwt.sign({ id: user.id, username: user.login }, secretKey, { expiresIn: '2h' });
+        res.token = token;
+
+        res.status(200).json({ message: "Login successful", user, token });
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ message: 'GitHub OAuth Error: ' + error.message });
+    }
+}
+
 module.exports = {
     createUser,
     loginUser,
@@ -177,5 +228,6 @@ module.exports = {
     getUserByUsername,
     updateUser,
     deleteUser,
-    getSession
+    getSession,
+    authUserCallback,
 };
