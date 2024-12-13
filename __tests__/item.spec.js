@@ -10,6 +10,8 @@ const express = require("express");
 const { MongoClient, ObjectId } = require("mongodb");
 // Import routes index where subroutes are defined
 const routes = require("../routes/index");
+// ***testing only itemController tests: 
+// const itemRoutes = require("../routes/itemRoutes");
 
 // Create instance of express
 const app = express();
@@ -17,87 +19,8 @@ const app = express();
 app.use(express.json());
 // Use routes module for requests to root "/"
 app.use("/", routes);
-
-// describe("Tests for connectDb function", () => {
-//   afterEach(() => {
-//     // Reset mocks and restore the original implementation
-//     jest.resetModules();
-//   });
-
-//   test("Should throw error when client not initialized", async () => {
-//     const { connectDb } = require("../database/connect");
-  
-//     // Call connectDb with undefined client
-//     await expect(connectDb(undefined)).rejects.toThrowError("MongoClient instance is required");
-//   });  
-// });
-
-// describe("Tests for connectDb function", () => {
-//   let spyConsoleErr;
-
-//   beforeEach(() => {
-//     // Mock console.error to track its calls
-//     spyConsoleErr = jest.spyOn(console, "error").mockImplementation();
-//   });
-
-//   afterEach(() => {
-//     // Restore the mock after each test
-//     jest.clearAllMocks();
-//     spyConsoleErr.mockRestore();
-//     jest.unmock("mongodb"); // Ensure no lingering mocks
-//   });
-
-//   test("Should handle MongoClient creation failure", async () => {
-//     // Mock case: MongoClient creation fails
-//     jest.mock("mongodb", () => {
-//       const originalModule = jest.requireActual("mongodb");
-//       return {
-//         ...originalModule,
-//         MongoClient: jest.fn(() => {
-//           throw new Error("MongoClient creation failed");
-//         }),
-//       };
-//     });
-
-//     const { connectDb } = require("../database/connect");
-
-//     await connectDb("team");
-
-//     // Verify console.error was called
-//     expect(spyConsoleErr).toHaveBeenCalledWith(
-//       "Failed to connect to MongoDB",
-//       expect.any(Error)
-//     );
-//   });
-// });
-
-// describe("Tests for getDb function", () => {
-//   afterEach(() => {
-//     // Reset mocks and restore the original implementation
-//     jest.resetModules();
-//   });
-
-//   test("Should throw an error when db is not initialized", () => {
-//     // Replace db variable with mocked version
-//     jest.mock("../database/connect", () => {
-//       // Import real mod in connect.js, but replace db
-//       const ogModule = jest.requireActual("../database/connect");
-//       // ret connect.js exports, replaces db export w/mock db
-//       return {
-//         ...ogModule,
-//       // Replace w/undefined to test when db not initialized
-//         db: undefined, // Simulate uninitialized db
-//       };
-//     });
-
-//     // Re-import mocked connect.js module to use undefined db
-//     const { getDb } = require("../database/connect");
-//     // Call getDb, which throws error because db is undefined
-//     expect(() => getDb()).toThrowError(
-//       "Database not initialized. Call connectDb first."
-//     );
-//   });
-// });
+// ***testing only itemController tests:
+// app.use("/item", itemRoutes);
 
 describe("Test controllers for 500 response", () => {
   beforeEach(() => {
@@ -135,12 +58,12 @@ describe("Test controllers for 500 response", () => {
     expect(res.status).toHaveBeenCalledWith(500);
     // Test that res.json is called with correct message
     expect(res.json).toHaveBeenCalledWith({
-      "error": "An error occurred: Failed to connect to MongoDB."
+      error: "An error occurred: Database not initialized. Call connectDb first.",
     });
   });
 
   test("Should return 500 if getItemById fails", async () => {
-    const { getItemById } = require("../controllers/itemController");
+    const { getItemById  } = require("../controllers/itemController");
 
     // Mock Express req and res objects
     const req = {
@@ -161,7 +84,7 @@ describe("Test controllers for 500 response", () => {
     expect(res.status).toHaveBeenCalledWith(500);
     // Test that res.json is called with correct message
     expect(res.json).toHaveBeenCalledWith({
-      "error": "An error occurred: Failed to connect to MongoDB."
+      error: "An error occurred: Failed to connect to MongoDB.",
     });
   });
 
@@ -171,13 +94,13 @@ describe("Test controllers for 500 response", () => {
     // Mock Express req and res objects
     const req = { 
       body: {
-        name: "test name", 
-        userId: null, 
-        categoryId: null, 
-        coverageId: null, 
-        purchaseDate: new Date(), 
-        purchasePrice: 0, 
-        description: "This is a jest unit test."
+        name: "Test Item",
+        userId: "user123",
+        categoryId: "cat456",
+        coverageId: "cov789",
+        purchaseDate: "2024-01-01",
+        purchasePrice: 99.99,
+        description: "Test item description"
       }
     };
     const res = {
@@ -197,20 +120,20 @@ describe("Test controllers for 500 response", () => {
   });
 
   test("Should return 500 if updateItem fails", async () => {
-    const { updateItem } = require("../controllers/itemController");
+    const { updateItem  } = require("../controllers/itemController");
 
     // Mock Express req and res objects
     const req = { params: { 
-      id: "6759d95c78b34f58d00456ba" 
+      id: "64b2fc2a4f0c9c1d2f8c8a4b" 
       }, 
       body: {
-        name: "test name", 
-        userId: null, 
-        categoryId: null, 
-        coverageId: null, 
-        purchaseDate: new Date(), 
-        purchasePrice: 0, 
-        description: "This is a jest unit test."
+        name: "Updated Test Item",
+        userId: "user123",
+        categoryId: "cat456",
+        coverageId: "cov789",
+        purchaseDate: "2024-01-01",
+        purchasePrice: 149.99,
+        description: "Updated test item description"
       }
     };
     const res = {
@@ -219,7 +142,7 @@ describe("Test controllers for 500 response", () => {
     };
 
     // Call the function with the mocked req/res values
-    await updateItem(req, res);
+    await updateItem (req, res);
 
     // Test that res.status is called with 500
     expect(res.status).toHaveBeenCalledWith(500);
@@ -233,7 +156,7 @@ describe("Test controllers for 500 response", () => {
     const { deleteItem } = require("../controllers/itemController");
 
     // Mock Express req and res objects
-    const req = { params: { id: "6759d95c78b34f58d00456ba" } };
+    const req = { params: { id: "64b2fc2a4f0c9c1d2f8c8a4b" } };
     const res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
@@ -251,73 +174,73 @@ describe("Test controllers for 500 response", () => {
   });
 });
 
-// describe("Tests updateItem controller for valid record not in database", () => {
-//   let connection;
-//   let db;
+describe("Tests updateItem controller for valid record not in database", () => {
+  let connection;
+  let db;
 
-//   beforeAll(async () => {
-//     connection = await MongoClient.connect(global.__MONGO_URI__);
-//     // Connect to team database explicitly
-//     db = await connection.db("team");
+  beforeAll(async () => {
+    connection = await MongoClient.connect(global.__MONGO_URI__);
+    // Connect to team database explicitly
+    db = await connection.db("team");
 
-//     jest.mock('../database/connect', () => ({
-//       getDb: jest.fn().mockReturnValue({
-//         collection: jest.fn().mockReturnValue({
-//           replaceOne: jest.fn().mockResolvedValue({ modifiedCount: 0 })
-//         })
-//       })
-//     }));
-//   });
+    jest.mock('../database/connect', () => ({
+      getDb: jest.fn().mockReturnValue({
+        collection: jest.fn().mockReturnValue({
+            updateOne: jest.fn().mockResolvedValue({ matchedCount: 0, modifiedCount: 0 })
+        })
+      })
+    }));
+  });
 
-//   /* Closes db connection, frees up resources, prevents memory leaks. */
-//   afterAll(async () => {
-//     await connection.close();
-//     jest.clearAllMocks(); // Clear any mock behavior
-//   });
+  /* Closes db connection, frees up resources, prevents memory leaks. */
+  afterAll(async () => {
+    await connection.close();
+    jest.clearAllMocks(); // Clear any mock behavior
+  });
 
-//   afterEach(() => {
-//     // Restore mocks
-//     jest.clearAllMocks();
-//     // Remove mock so other tests are not affected
-//     jest.unmock("../database/connect");
-//     jest.resetModules();
-//   });
+  afterEach(() => {
+    // Restore mocks
+    jest.clearAllMocks();
+    // Remove mock so other tests are not affected
+    jest.unmock("../database/connect");
+    jest.resetModules();
+  });
 
-//   test("Should return 404 if record does not exist when updating item", async () => {
-//     // Mock Express req and res objects
-//     const req = {
-//       params: {
-//         // Mock valid ObjectId
-//         id: "6759f2d2b7aaf3eb2152c14b", 
-//       }, 
-//       body: {
-//         name: "test name", 
-//         userId: null, 
-//         categoryId: null, 
-//         coverageId: null, 
-//         purchaseDate: new Date(), 
-//         purchasePrice: 0, 
-//         description: "This is a jest unit test."
-//       }, 
-//     };
+  test("Should return 404 if record does not exist when updating item", async () => {
+    // Mock Express req and res objects
+    const req = {
+      params: {
+        // Mock valid ObjectId
+        id: "6759f2d2b7aaf3eb2152c14b", 
+      }, 
+      body: {
+        name: "Test Item",
+        userId: null,
+        categoryId: null,
+        coverageId: null,
+        purchaseDate: new Date(),
+        purchasePrice: 99.99,
+        description: "This is a test item"
+      }, 
+    };
     
-//     const res = {
-//       status: jest.fn().mockReturnThis(),
-//       json: jest.fn(),
-//     };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
 
-//     const { updateItem } = require("../controllers/itemController");
+    const { updateItem } = require("../controllers/itemController");
 
-//     // Call the function with the mocked req/res values
-//     await updateItem(req, res);
+    // Call the function with the mocked req/res values
+    await updateItem(req, res);
   
-//     // Verify that the invalid ID is handled correctly
-//     expect(res.status).toHaveBeenCalledWith(404);
-//     expect(res.json).toHaveBeenCalledWith({
-//       error: "Item not found.",
-//     });
-//   });
-// });
+    // Verify that the invalid ID is handled correctly
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Item not found.",
+    });
+  });
+});
 
 describe("Tests deleteItem controller for valid record not in database", () => {
   let connection;
@@ -356,8 +279,8 @@ describe("Tests deleteItem controller for valid record not in database", () => {
     const req = {
       params: {
         // Mock valid ObjectId
-        id: "6759f2d2b7aaf3eb2152c14b", 
-      },  
+        id: "64b2fc2a4f0c9c1d2f8c8a4b", 
+      }
     };
     
     const res = {
