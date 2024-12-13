@@ -1,6 +1,8 @@
 // Create a new router object using the express framework
 const router = require("express").Router();
 
+const { ensureAuthenticated } = require("../session");
+
 // Set up Swagger subroute
 router.use("/", require("./swagger"));
 
@@ -10,6 +12,7 @@ router.use("/", require("./swagger"));
 // router.use("/item", require("./itemRoutes"));
 // router.use("/user", require("./userRoutes"));
 router.use("/coverage", require("./coverageRoutes"));
+// router.use("/coverage", ensureAuthenticated, require("./coverageRoutes"));
 
 // Exports router object 
 module.exports = router;

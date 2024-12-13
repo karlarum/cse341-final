@@ -8,11 +8,14 @@ const uri = process.env.MONGODB_URI;
 let db;
 
 const connectDb = async () => {
+  // if (!clientDb) {
+  //   throw new Error("MongoClient instance is required");
+  // }
   try {
     const client = new MongoClient(uri);
     await client.connect();
     db = client.db("team");
-    console.log("Connected to MongoDB");
+    console.log("Connected to MongoDB:", db.databaseName);
   } catch (error) {
     console.error("Failed to connect to MongoDB", error);
   }
