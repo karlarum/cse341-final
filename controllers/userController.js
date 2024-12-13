@@ -195,7 +195,7 @@ const authUserCallback = async ({ query: { code } }, res) => {
             console.error("Error:", errorData);
             return res.status(response.status).json({ message: 'GitHub OAuth Error: ' + errorData.error_description });
         }
-        const data = response.json();
+        const data = await response.json();
         const access_token = data.access_token;
 
         const userResponse = await fetch('https://api.github.com/user', {
@@ -214,7 +214,7 @@ const authUserCallback = async ({ query: { code } }, res) => {
         const token = jwt.sign({ id: user.id, username: user.login }, secretKey, { expiresIn: '2h' });
         res.token = token;
 
-        res.status(200).json({ message: "Login successful", user, token });
+        res.status(200).json({ message: "Login successful", user: { id: user.id, username: user.login }, token });
     } catch (error) {
         console.error("Error:", error);
         res.status(500).json({ message: 'GitHub OAuth Error: ' + error.message });
