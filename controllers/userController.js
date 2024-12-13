@@ -105,6 +105,11 @@ const getUserByUsername = async (req, res) => {
 // UPDATE user
 const updateUser = async (req, res) => {
     const username = req.params.username;
+    const searchUsername = req.params.username;
+
+    if (searchUsername !== username) {
+        return res.status(401).json({ error: "Unauthorized: Requesting someone elses data" });
+    }
     const updatedUserData = {
         username: req.body.username,
         password: req.body.password,
