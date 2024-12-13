@@ -96,3 +96,60 @@ GET http://localhost:3000/coverage
 
 ###
 https://jsonplaceholder.typicode.com/posts/1
+
+# ======= USER ROUTES TESTING =======
+
+### LOCAL USER REQUESTS ###
+
+### Creating a user
+POST http://localhost:3000/user HTTP/1.1
+Content-Type: application/json
+
+{
+  "username": "ethansglenn",
+  "password": "something",
+  "firstName": "Ethan",
+  "lastName": "Glenn",
+  "email": "ethansglenn@gmail.com",
+  "phone": "555-555-5555",
+  "address": "123 Candy Cane Ln",
+  "city": "Rexburg",
+  "state": "ID",
+  "zip": "83440"
+}
+
+### Authenticate a user
+POST http://localhost:3000/user/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "username": "ethansglenn",
+  "password": "something"
+}
+
+### Get user information
+GET http://localhost:3000/user/ethansglenn
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NWI5NWNhODJkZWZmNDZjMDdiODllMSIsInVzZXJuYW1lIjoiZXRoYW5zZ2xlbm4iLCJpYXQiOjE3MzQwNTU1MjQsImV4cCI6MTczNDA2MjcyNH0.kTalV3WfiqUaw60qSahQQW7LUqavzhr7-2Qew0y_Zwg
+
+### Update user information
+PUT http://localhost:3000/user/ethansglenn
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NWI3ODJlZmQzNjE2MTFkMDkxNjNjNiIsInVzZXJuYW1lIjoiZXRoYW5zZ2xlbm4iLCJpYXQiOjE3MzQwNDkwOTcsImV4cCI6MTczNDA1NjI5N30.f9hw1rTvl8j-t5VFueRr0g-X2g3UJl0TccilXWna4EE
+Content-Type: application/json
+
+{
+  "username": "ethansglenn",
+  "password": "something",
+  "firstName": "Ethan",
+  "lastName": "Glenn",
+  "email": "ethansglenn@gmail.com",
+  "phone": "555-123-5555",
+  "address": "123 Candy Cane Ln",
+  "city": "Rexburg",
+  "state": "ID",
+  "zip": "83440"
+}
+
+### Delete a user
+DELETE http://localhost:3000/user/ethansglenn
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NWI5NWNhODJkZWZmNDZjMDdiODllMSIsInVzZXJuYW1lIjoiZXRoYW5zZ2xlbm4iLCJpYXQiOjE3MzQwNTU1MjQsImV4cCI6MTczNDA2MjcyNH0.kTalV3WfiqUaw60qSahQQW7LUqavzhr7-2Qew0y_Zwg
+
