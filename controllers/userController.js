@@ -2,7 +2,6 @@ const { getDb } = require("../database/connect");
 const jwt = require('jsonwebtoken');
 require("dotenv").config();
 const secretKey = process.env.SECRET_KEY;
-const { decodeAuthToken } = require('../src/session');
 
 const createUser = async (req, res) => {
     const user = {
