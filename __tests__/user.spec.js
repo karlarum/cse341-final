@@ -36,12 +36,12 @@ describe("Tests getUserByUsername controller for valid record not in database", 
     // Connect to team database explicitly
     db = await connection.db("team");
 
-    jest.mock('../database/connect', () => ({
+    jest.mock("../database/connect", () => ({
       getDb: jest.fn().mockReturnValue({
         collection: jest.fn().mockReturnValue({
-          deleteOne: jest.fn().mockResolvedValue({ deletedCount: 0 })
-        })
-      })
+          deleteOne: jest.fn().mockResolvedValue({ deletedCount: 0 }),
+        }),
+      }),
     }));
   });
 
@@ -60,17 +60,17 @@ describe("Tests getUserByUsername controller for valid record not in database", 
   });
 
   test("Should return 401 if is unauthorized when searching user", async () => {
-    const { getUserByUsername  } = require("../controllers/userController");
+    const { getUserByUsername } = require("../controllers/userController");
 
     // Mock Express req and res objects
     const req = {
       params: {
         // Mock valid ObjectId
-        username: "user", 
+        username: "user",
       },
       user: {
-        username: "mockUser"
-      }
+        username: "mockUser",
+      },
     };
     const res = {
       status: jest.fn().mockReturnThis(),
@@ -87,25 +87,44 @@ describe("Tests getUserByUsername controller for valid record not in database", 
       error: "Unauthorized: Requesting someone elses data",
     });
   });
-});
 
-describe("Tests deleteUser controller for valid record not in database", () => {
-  let connection;
-  let db;
+  const { getAuth } = require("../routes/userRoutes"); // Import the route handler, adjust based on your file structure
 
-  beforeAll(async () => {
-    connection = await MongoClient.connect(global.__MONGO_URI__);
-    // Connect to team database explicitly
-    db = await connection.db("team");
+  //   test("Should redirect to GitHub OAuth authorization URL", async () => {
+  //     // Mock Express req and res objects
+  //     const req = {}; // Empty object for a GET request
+  //     const res = {
+  //       redirect: jest.fn(), // Mock the redirect method
+  //     };
 
-    jest.mock('../database/connect', () => ({
-      getDb: jest.fn().mockReturnValue({
-        collection: jest.fn().mockReturnValue({
-          deleteOne: jest.fn().mockResolvedValue({ deletedCount: 0 })
-        })
-      })
-    }));
-  });
+  //     // Call the route handler directly with the mocked req/res values
+  //     await getAuth(req, res); // Assuming you export a specific handler like getAuth
+
+  //     // Construct the expected GitHub OAuth URL
+  //     const expectedRedirectUrl = `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_CLIENT_ID}&redirect_uri=${process.env.GITHUB_REDIRECT_URI}&scope=user`;
+
+  //     // Verify that the redirect method is called with the expected URL
+  //     expect(res.redirect).toHaveBeenCalledWith(expectedRedirectUrl);
+  //   });
+  // });
+
+  // describe("Tests deleteUser controller for valid record not in database", () => {
+  //   let connection;
+  //   let db;
+
+  //   beforeAll(async () => {
+  //     connection = await MongoClient.connect(global.__MONGO_URI__);
+  //     // Connect to team database explicitly
+  //     db = await connection.db("team");
+
+  //     jest.mock("../database/connect", () => ({
+  //       getDb: jest.fn().mockReturnValue({
+  //         collection: jest.fn().mockReturnValue({
+  //           deleteOne: jest.fn().mockResolvedValue({ deletedCount: 0 }),
+  //         }),
+  //       }),
+  //     }));
+  //   });
 
   /* Closes db connection, frees up resources, prevents memory leaks. */
   afterAll(async () => {
@@ -126,14 +145,14 @@ describe("Tests deleteUser controller for valid record not in database", () => {
     const req = {
       params: {
         // Mock username parameter
-        username: "userA", 
-      }, 
+        username: "userA",
+      },
       user: {
         // Mock user parameter
-        username: "user", 
-      }
+        username: "user",
+      },
     };
-    
+
     const res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
@@ -143,7 +162,7 @@ describe("Tests deleteUser controller for valid record not in database", () => {
 
     // Call the function with the mocked req/res values
     await deleteUser(req, res);
-  
+
     // Verify that the invalid ID is handled correctly
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.json).toHaveBeenCalledWith({
@@ -165,19 +184,19 @@ describe("Tests updateUser controller for valid record not in database", () => {
     // Connect to team database explicitly
     db = await connection.db("team");
 
-    jest.mock('../database/connect', () => ({
+    jest.mock("../database/connect", () => ({
       getDb: jest.fn().mockReturnValue({
         collection: jest.fn().mockReturnValue({
-          updateOne: jest.fn().mockResolvedValue({ modifiedCount: 0 })
-        })
-      })
+          updateOne: jest.fn().mockResolvedValue({ modifiedCount: 0 }),
+        }),
+      }),
     }));
   });
 
   /* Closes db connection, frees up resources, prevents memory leaks. */
   afterAll(async () => {
     await connection.close();
-    jest.clearAllMocks(); 
+    jest.clearAllMocks();
   });
 
   afterEach(() => {
@@ -193,8 +212,8 @@ describe("Tests updateUser controller for valid record not in database", () => {
     const req = {
       params: {
         // Mock valid ObjectId
-        id: "6759f2d2b7aaf3eb2152c14b", 
-      }, 
+        id: "6759f2d2b7aaf3eb2152c14b",
+      },
       body: {
         userName: "mockUser",
         password: "password",
@@ -204,11 +223,11 @@ describe("Tests updateUser controller for valid record not in database", () => {
         phone: "555-555-5555",
         address: "123 Mock Street",
         city: "Mock City",
-        state: "AB", 
-        zip: "55555", 
-      }, 
+        state: "AB",
+        zip: "55555",
+      },
     };
-    
+
     const res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
@@ -218,7 +237,7 @@ describe("Tests updateUser controller for valid record not in database", () => {
 
     // Call the function with the mocked req/res values
     await updateUser(req, res);
-  
+
     // Verify that the invalid ID is handled correctly
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.json).toHaveBeenCalledWith({
@@ -236,12 +255,12 @@ describe("Tests deleteUser controller for valid record not in database", () => {
     // Connect to team database explicitly
     db = await connection.db("team");
 
-    jest.mock('../database/connect', () => ({
+    jest.mock("../database/connect", () => ({
       getDb: jest.fn().mockReturnValue({
         collection: jest.fn().mockReturnValue({
           deleteOne: jest.fn(() => Promise.resolve({ deletedCount: 0 })),
-        })
-      })
+        }),
+      }),
     }));
   });
 
@@ -296,13 +315,16 @@ describe("createUser", () => {
     // Connect to team database explicitly
     db = await connection.db("team");
 
-    jest.mock('../database/connect', () => ({
+    jest.mock("../database/connect", () => ({
       getDb: jest.fn(),
     }));
   });
 
   beforeEach(() => {
-    const mockInsertResponse = { acknowledged: true, insertedId: "mockedUserId" };
+    const mockInsertResponse = {
+      acknowledged: true,
+      insertedId: "mockedUserId",
+    };
     const mockDb = {
       collection: jest.fn(() => ({
         findOne: jest.fn().mockResolvedValue(null), // No existing user
@@ -348,7 +370,7 @@ describe("createUser", () => {
 
   test("should return 201 when user is successfully created", async () => {
     const { createUser } = require("../controllers/userController");
-    
+
     await createUser(req, res);
 
     const { getDb } = require("../database/connect");
@@ -359,7 +381,7 @@ describe("createUser", () => {
 
   test("should return 409 when username already exists", async () => {
     const { createUser } = require("../controllers/userController");
-    
+
     const mockDb = {
       collection: jest.fn(() => ({
         findOne: jest.fn().mockResolvedValue({ username: "newuser" }), // Existing user
@@ -377,7 +399,7 @@ describe("createUser", () => {
 
   test("should return 500 when database insert fails", async () => {
     const { createUser } = require("../controllers/userController");
-    
+
     const mockDb = {
       collection: jest.fn(() => ({
         findOne: jest.fn().mockResolvedValue(null),
@@ -389,10 +411,11 @@ describe("createUser", () => {
     await createUser(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ error: expect.stringContaining("An error occurred:") });
+    expect(res.json).toHaveBeenCalledWith({
+      error: expect.stringContaining("An error occurred:"),
+    });
   });
 });
-
 
 // ########################
 // Testing HTTP 500 Errors
@@ -406,7 +429,7 @@ describe("Test controllers for 500 response", () => {
       }),
     }));
   });
-  
+
   afterEach(() => {
     // Restore mocks
     jest.clearAllMocks();
@@ -420,10 +443,10 @@ describe("Test controllers for 500 response", () => {
     const { createUser } = require("../controllers/userController");
 
     // Mock Express req and res objects
-    const req = { 
-      params: { 
-        id: "64b2fc2a4f0c9c1d2f8c8a4b" 
-      }, 
+    const req = {
+      params: {
+        id: "64b2fc2a4f0c9c1d2f8c8a4b",
+      },
       body: {
         name: "Updated Test Item",
         userId: "user123",
@@ -431,8 +454,8 @@ describe("Test controllers for 500 response", () => {
         coverageId: "cov789",
         purchaseDate: "2024-01-01",
         purchasePrice: 149.99,
-        description: "Updated test item description"
-      }
+        description: "Updated test item description",
+      },
     };
     const res = {
       status: jest.fn().mockReturnThis(),
@@ -457,14 +480,14 @@ describe("Test controllers for 500 response", () => {
     const req = {
       params: {
         // Mock valid ObjectId
-        id: "6759f2d2b7aaf3eb2152c14b", 
-      }, 
+        id: "6759f2d2b7aaf3eb2152c14b",
+      },
       body: {
         userName: "mockUser",
         password: "password",
-      }, 
+      },
     };
-    
+
     const res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
@@ -476,8 +499,8 @@ describe("Test controllers for 500 response", () => {
     // Test that res.status is called with 500
     expect(res.status).toHaveBeenCalledWith(500);
     // Test that res.json is called with correct message
-    expect(res.json).toHaveBeenCalledWith({ 
-      "error": "An error occurred: Failed to connect to MongoDB."
+    expect(res.json).toHaveBeenCalledWith({
+      error: "An error occurred: Failed to connect to MongoDB.",
     });
   });
 
@@ -487,10 +510,10 @@ describe("Test controllers for 500 response", () => {
     // Mock Express req and res objects
     const req = {
       session: {
-        destroy: jest.fn((callback) => callback()) 
-      }, 
+        destroy: jest.fn((callback) => callback()),
+      },
     };
-    
+
     const res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
@@ -502,23 +525,23 @@ describe("Test controllers for 500 response", () => {
     // Test that res.status is called with 500
     expect(res.status).toHaveBeenCalledWith(500);
     // Test that res.json is called with correct message
-    expect(res.json).toHaveBeenCalledWith({ 
-      "error": "An error occurred: res.clearCookie is not a function"
+    expect(res.json).toHaveBeenCalledWith({
+      error: "An error occurred: res.clearCookie is not a function",
     });
   });
 
   test("Should return 500 if getUserByUsername fails", async () => {
-    const { getUserByUsername  } = require("../controllers/userController");
+    const { getUserByUsername } = require("../controllers/userController");
 
     // Mock Express req and res objects
     const req = {
       params: {
         // Mock valid ObjectId
-        username: "mockUser", 
+        username: "mockUser",
       },
       user: {
-        username: "mockUser"
-      }
+        username: "mockUser",
+      },
     };
     const res = {
       status: jest.fn().mockReturnThis(),
@@ -536,17 +559,17 @@ describe("Test controllers for 500 response", () => {
     });
   });
 
-test("Should return 500 if updateUser fails", async () => {
+  test("Should return 500 if updateUser fails", async () => {
     // Mock Express req and res objects
     const req = {
       params: {
         // Mock username parameter
-        username: "mockUser", 
-      }, 
+        username: "mockUser",
+      },
       user: {
         // Mock user parameter
-        username: "user", 
-      }, 
+        username: "user",
+      },
       body: {
         userName: "mockUser",
         password: "password",
@@ -556,11 +579,11 @@ test("Should return 500 if updateUser fails", async () => {
         phone: "555-555-5555",
         address: "123 Mock Street",
         city: "Mock City",
-        state: "AB", 
-        zip: "55555", 
-      }, 
+        state: "AB",
+        zip: "55555",
+      },
     };
-    
+
     const res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
@@ -570,7 +593,7 @@ test("Should return 500 if updateUser fails", async () => {
 
     // Call the function with the mocked req/res values
     await updateUser(req, res);
-  
+
     // Test that res.status is called with 500
     expect(res.status).toHaveBeenCalledWith(500);
     // Test that res.json is called with correct message
@@ -584,14 +607,14 @@ test("Should return 500 if updateUser fails", async () => {
     const req = {
       params: {
         // Mock username parameter
-        username: undefined, 
-      }, 
+        username: undefined,
+      },
       user: {
         // Mock user parameter
-        username: undefined, 
-      }, 
+        username: undefined,
+      },
     };
-    
+
     const res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
@@ -601,7 +624,7 @@ test("Should return 500 if updateUser fails", async () => {
 
     // Call the function with the mocked req/res values
     await deleteUser(req, res);
-  
+
     // Test that res.status is called with 500
     expect(res.status).toHaveBeenCalledWith(500);
     // Test that res.json is called with correct message
@@ -624,13 +647,16 @@ describe("Test loginUser error codes", () => {
     // Connect to team database explicitly
     db = await connection.db("team");
 
-    jest.mock('../database/connect', () => ({
+    jest.mock("../database/connect", () => ({
       getDb: jest.fn(),
     }));
   });
 
   beforeEach(() => {
-    const mockInsertResponse = { acknowledged: true, insertedId: "mockedUserId" };
+    const mockInsertResponse = {
+      acknowledged: true,
+      insertedId: "mockedUserId",
+    };
     const mockDb = {
       collection: jest.fn(() => ({
         findOne: jest.fn().mockResolvedValue(null), // No existing user
@@ -774,7 +800,7 @@ describe("Testing logoutUser error codes", () => {
 
   test("should return 200 and clear session if logout is successful", () => {
     req.session.destroy.mockImplementationOnce((callback) => callback(null)); // No error
-    
+
     const { logoutUser } = require("../controllers/userController");
 
     logoutUser(req, res);
@@ -831,7 +857,7 @@ describe("Testing getUserByUsername error codes", () => {
   beforeEach(() => {
     req = {
       params: { username: "testuser" }, // Simulate the requested username
-      user: { username: "testuser" },  // Simulate the logged-in user
+      user: { username: "testuser" }, // Simulate the logged-in user
     };
 
     res = {
@@ -894,7 +920,6 @@ describe("Testing getUserByUsername error codes", () => {
   });
 });
 
-
 // ###################################
 // Testing getSession
 // ###################################
@@ -920,7 +945,7 @@ describe("Testin getSession functionality", () => {
   test("should return undefined no user", () => {
     const req = {
       // Empty session
-      session: {}, 
+      session: {},
     };
 
     const { getSession } = require("../controllers/userController");

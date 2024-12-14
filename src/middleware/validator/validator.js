@@ -68,12 +68,7 @@ const categoryValidation = () => {
       .optional()
       .isLength({ max: 250 })
       .withMessage("Description must not exceed 250 characters."),
-    body("createdAt")
-      .exists({ checkFalsy: true })
-      .withMessage("A creation date is required.")
-      .bail()
-      .isDate({ format: "YYYY-MM-DD", strictMode: true })
-      .withMessage("Please enter date in the format YYYY-MM-DD."),
+    body("parent_id").optional().matches(/[0-9]/),
   ];
 };
 
