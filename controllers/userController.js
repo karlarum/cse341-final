@@ -64,7 +64,7 @@ const logoutUser = async (req, res) => {
     try {
         req.session.destroy(err => {
             if (err) {
-                console.error("Error destroying session:", err);
+                // console.error("Error destroying session:", err);
                 return res.status(500).json({ error: "Logout failed" });
             }
             res.clearCookie('connect.sid');

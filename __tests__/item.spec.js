@@ -626,7 +626,7 @@ describe("Test createItem with failed insert", () => {
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
-      error: "An error occurred: Database not initialized. Call connectDb first."
+      error: "Failed to create the item."
     });
   });
 });
