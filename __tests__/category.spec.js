@@ -252,7 +252,6 @@ describe("Test controllers for 500 response", () => {
       error: "No Category found with that ID.",
     });
   });
-
   test("Should return 404 if category not found", async () => {
     const { getCategoryById } = require("../controllers/categoryController");
 
@@ -301,5 +300,73 @@ describe("Test controllers for 500 response", () => {
 
     expect(res.status).toHaveBeenCalledWith(200); // Check for 200 response
     expect(res.json).toHaveBeenCalledWith(mockCategory); // Ensure the correct category is returned
+  });
+  test("Should return 201 and category ID if category is created successfully", async () => {
+    const { createCategory } = require("../controllers/categoryController");
+
+    const req = {
+      body: {
+        name: "Test Category",
+        description: "This is a test category",
+        parent_id: null,
+      },
+    };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    const mockResponse = {
+      acknowledged: true,
+      insertedId: "64b2fc2a4f0c9c1d2f8c8a4b",
+    };
+
+    // Mock the database response to simulate a successful insert
+    getDb.mockReturnValue({
+      collection: jest.fn().mockReturnValue({
+        insertOne: jest.fn().mockResolvedValue(mockResponse),
+      }),
+    });
+
+    await createCategory(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(201); // Check for 201 response
+    expect(res.json).toHaveBeenCalledWith({
+      CategoryId: mockResponse.insertedId,
+    }); // Ensure the correct CategoryId is returned
+  });
+  test("Should return 500 if category creation fails", async () => {
+    const { createCategory } = require("../controllers/categoryController");
+
+    const req = {
+      body: {
+        name: "Test Category",
+        description: "This is a test category",
+        parent_id: null,
+      },
+    };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    const mockResponse = {
+      acknowledged: false,
+      insertedId: null,
+    };
+
+    // Mock the database response to simulate a failure in insertion
+    getDb.mockReturnValue({
+      collection: jest.fn().mockReturnValue({
+        insertOne: jest.fn().mockResolvedValue(mockResponse),
+      }),
+    });
+
+    await createCategory(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500); // Check for 500 response
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Failed to create the Category.",
+    }); // Ensure the correct error message is returned
   });
 });
