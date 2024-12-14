@@ -11,7 +11,6 @@ const { ensureAuthenticated } = require("../src/session");
 // router.use("/category", require("./categoryRoutes"));
 // router.use("/item", require("./itemRoutes"));
 // router.use("/user", require("./userRoutes"));
-router.use(ensureAuthenticated);
 
 router.use("/category", require("./catergoryRoutes"));
 router.use("/item", require("./itemRoutes"));
