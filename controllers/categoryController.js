@@ -6,7 +6,6 @@ const getCategories = async (req, res) => {
     const db = getDb();
     const categoryCollection = db.collection("category");
     const count = await categoryCollection.countDocuments();
-    console.log("Number of documents in Categorys collection:", count);
 
     // Fetch all Categorys from the collection
     const categories = await categoryCollection.find().toArray();
@@ -68,7 +67,6 @@ const createCategory = async (req, res) => {
 /* UPDATE Category */
 const updateCategory = async (req, res) => {
   const objectId = new ObjectId(req.params.id);
-  console.log("Converted categoryId:", objectId);
 
   const updatedCategory = {
     name: req.body.name,
@@ -83,8 +81,6 @@ const updateCategory = async (req, res) => {
       { _id: objectId },
       { $set: updatedCategory }
     );
-
-    console.log("response", response);
 
     if (response.matchedCount === 0) {
       // If no document is found

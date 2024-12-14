@@ -252,6 +252,7 @@ describe("Test controllers for 500 response", () => {
       error: "No Category found with that ID.",
     });
   });
+
   test("Should return 404 if category not found", async () => {
     const { getCategoryById } = require("../controllers/categoryController");
 
@@ -301,6 +302,7 @@ describe("Test controllers for 500 response", () => {
     expect(res.status).toHaveBeenCalledWith(200); // Check for 200 response
     expect(res.json).toHaveBeenCalledWith(mockCategory); // Ensure the correct category is returned
   });
+
   test("Should return 201 and category ID if category is created successfully", async () => {
     const { createCategory } = require("../controllers/categoryController");
 
@@ -335,6 +337,7 @@ describe("Test controllers for 500 response", () => {
       CategoryId: mockResponse.insertedId,
     }); // Ensure the correct CategoryId is returned
   });
+
   test("Should return 500 if category creation fails", async () => {
     const { createCategory } = require("../controllers/categoryController");
 
@@ -368,5 +371,92 @@ describe("Test controllers for 500 response", () => {
     expect(res.json).toHaveBeenCalledWith({
       error: "Failed to create the Category.",
     }); // Ensure the correct error message is returned
+  });
+
+  test("Should return 404 if no category is found with the given ID", async () => {
+    const { updateCategory } = require("../controllers/categoryController");
+
+    const req = {
+      params: { id: "64b2fc2a4f0c9c1d2f8c8a4b" }, // Non-existent category ID
+      body: { name: "Updated Category", description: "Updated Description" },
+    };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    // Mock database response to simulate no category being found
+    getDb.mockReturnValue({
+      collection: jest.fn().mockReturnValue({
+        updateOne: jest
+          .fn()
+          .mockResolvedValue({ matchedCount: 0, modifiedCount: 0 }), // No category found
+      }),
+    });
+
+    await updateCategory(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "No Category found with that ID.",
+    });
+  });
+
+  test("Should return 200 if category is successfully updated", async () => {
+    const { updateCategory } = require("../controllers/categoryController");
+
+    const req = {
+      params: { id: "64b2fc2a4f0c9c1d2f8c8a4b" }, // Existing category ID
+      body: { name: "Updated Category", description: "Updated Description" },
+    };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    // Mock database response to simulate successful update
+    getDb.mockReturnValue({
+      collection: jest.fn().mockReturnValue({
+        updateOne: jest
+          .fn()
+          .mockResolvedValue({ matchedCount: 1, modifiedCount: 1 }), // Category updated
+      }),
+    });
+
+    await updateCategory(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
+      message: "Category updated successfully.",
+    });
+  });
+
+  test("Should return 400 if category data was not changed", async () => {
+    const { updateCategory } = require("../controllers/categoryController");
+
+    const req = {
+      params: { id: "64b2fc2a4f0c9c1d2f8c8a4b" }, // Existing category ID
+      body: { name: "Same Category", description: "Same Description" }, // Same data, no change
+    };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    // Mock database response to simulate no modification
+    getDb.mockReturnValue({
+      collection: jest.fn().mockReturnValue({
+        updateOne: jest
+          .fn()
+          .mockResolvedValue({ matchedCount: 1, modifiedCount: 0 }), // Category found but no change
+      }),
+    });
+
+    await updateCategory(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Category data was not changed.",
+    });
   });
 });
