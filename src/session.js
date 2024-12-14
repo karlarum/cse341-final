@@ -10,11 +10,7 @@ const ensureAuthenticated = (req, res, next) => {
         return res.status(401).json({ error: 'Unauthorized: No token provided' });
     }
 
-    const token = authHeader.split(' ')[1];
-    if (!token) {
-        console.log('No token provided');
-        return res.status(401).json({ error: 'Unauthorized: No token provided' });
-    }
+    const token = authHeader;
 
     try {
         const decoded = jwt.verify(token, secretKey);
