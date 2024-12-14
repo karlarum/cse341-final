@@ -3,10 +3,10 @@ const mongoose = require("mongoose");
 const mongoDB = require("./database/connect");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
-const categoryRoutes = require("./routes/category");
+const categoryRoutes = require("./routes/categoryRoutes");
 const itemRoutes = require("./routes/itemRoutes");
 const userRoutes = require("./routes/userRoutes");
-const session = require('express-session');
+const session = require("express-session");
 require("dotenv").config();
 
 const app = express();
@@ -16,12 +16,14 @@ const secretKey = process.env.SECRET_KEY;
 
 app.use(express.json());
 
-app.use(session({
-  secret: secretKey,
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: deployment === 'prod' }
-}));
+app.use(
+  session({
+    secret: secretKey,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: deployment === "prod" },
+  })
+);
 
 app
   .use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument))
