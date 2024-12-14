@@ -1,4 +1,4 @@
-const { connectDb, getDb } = require("../database/connect");
+const { getDb } = require("../database/connect");
 const request = require("supertest");
 const express = require("express");
 const { MongoClient, ObjectId } = require("mongodb");
@@ -15,39 +15,35 @@ jest.mock("../database/connect", () => ({
 
 describe("Test controllers for 500 response", () => {
   afterEach(() => {
-    jest.clearAllMocks();
+    jest.clearAllMocks(); // Clear mock data after each test
   });
 
   test("Should return 200 and categories list when fetch is successful", async () => {
     const { getCategories } = require("../controllers/categoryController");
 
-    // Mock the database response
     const mockCategories = [
       { _id: "1", name: "Category 1" },
       { _id: "2", name: "Category 2" },
     ];
 
-    // Mock the getDb function to return a mocked database connection
+    // Mock the database response
     getDb.mockReturnValue({
       collection: jest.fn().mockReturnValue({
-        countDocuments: jest.fn().mockResolvedValue(mockCategories.length), // Mock countDocuments
+        countDocuments: jest.fn().mockResolvedValue(mockCategories.length),
         find: jest.fn().mockReturnValue({
-          toArray: jest.fn().mockResolvedValue(mockCategories), // Mock toArray to return categories
+          toArray: jest.fn().mockResolvedValue(mockCategories),
         }),
       }),
     });
 
-    // Mock Express req and res objects
     const req = {}; // No params needed for fetching categories
     const res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
     };
 
-    // Call the getCategories function with the mocked req/res values
     await getCategories(req, res);
 
-    // Assertions to check if the correct status and data were returned
     expect(res.status).toHaveBeenCalledWith(200); // Check for 200 response
     expect(res.json).toHaveBeenCalledWith(mockCategories); // Ensure the correct data is returned
   });
@@ -55,7 +51,6 @@ describe("Test controllers for 500 response", () => {
   test("Should return 500 if getCategories fails", async () => {
     const { getCategories } = require("../controllers/categoryController");
 
-    // Mock Express req and res objects
     const req = {};
     const res = {
       status: jest.fn().mockReturnThis(),
@@ -79,12 +74,25 @@ describe("Test controllers for 500 response", () => {
     });
   });
 
+  test("Should return 400 if ID is invalid in getCategoryById", async () => {
+    const { getCategoryById } = require("../controllers/categoryController");
+
+    const req = { params: { id: "invalid-id" } }; // Invalid category ID
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    await getCategoryById(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400); // Check for 400 response
+    expect(res.json).toHaveBeenCalledWith({ error: "Invalid ID" });
+  });
+
   test("Should return 500 if getCategoryById fails", async () => {
     const { getCategoryById } = require("../controllers/categoryController");
 
-    const req = {
-      params: { id: "64b2fc2a4f0c9c1d2f8c8a4b" },
-    };
+    const req = { params: { id: "64b2fc2a4f0c9c1d2f8c8a4b" } };
     const res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
@@ -107,35 +115,6 @@ describe("Test controllers for 500 response", () => {
     });
   });
 
-  const { getCategoryById } = require("../controllers/categoryController");
-  const { getDb } = require("../database/connect");
-
-  jest.mock("../database/connect", () => ({
-    getDb: jest.fn(),
-  }));
-
-  describe("getCategoryById controller", () => {
-    afterEach(() => {
-      jest.clearAllMocks(); // Clear mock data after each test
-    });
-
-    test("Should return 400 if ID is invalid", async () => {
-      // Mock Express req and res objects
-      const req = { params: { id: "invalid-id" } }; // Provide an invalid category ID (non-ObjectId)
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      };
-
-      // Call the getCategoryById function with the mocked req/res values
-      await getCategoryById(req, res);
-
-      // Assertions to check if the correct status and message were returned
-      expect(res.status).toHaveBeenCalledWith(400); // Check for 400 response
-      expect(res.json).toHaveBeenCalledWith({ error: "Invalid ID" }); // Ensure the correct error message is returned
-    });
-  });
-
   test("Should return 500 if createCategory fails", async () => {
     const { createCategory } = require("../controllers/categoryController");
 
@@ -151,7 +130,6 @@ describe("Test controllers for 500 response", () => {
       json: jest.fn(),
     };
 
-    // Simulate db failure
     getDb.mockReturnValue({
       collection: jest.fn().mockReturnValue({
         insertOne: jest
@@ -184,7 +162,6 @@ describe("Test controllers for 500 response", () => {
       json: jest.fn(),
     };
 
-    // Simulate db failure
     getDb.mockReturnValue({
       collection: jest.fn().mockReturnValue({
         updateOne: jest
@@ -210,7 +187,6 @@ describe("Test controllers for 500 response", () => {
       json: jest.fn(),
     };
 
-    // Simulate db failure
     getDb.mockReturnValue({
       collection: jest.fn().mockReturnValue({
         deleteOne: jest
@@ -238,7 +214,6 @@ describe("Test controllers for 500 response", () => {
 
     const mockDeleteResponse = { deletedCount: 1 };
 
-    // Mock successful db response
     getDb.mockReturnValue({
       collection: jest.fn().mockReturnValue({
         deleteOne: jest.fn().mockResolvedValue(mockDeleteResponse),
@@ -264,7 +239,6 @@ describe("Test controllers for 500 response", () => {
 
     const mockDeleteResponse = { deletedCount: 0 };
 
-    // Mock failed db response (category not found)
     getDb.mockReturnValue({
       collection: jest.fn().mockReturnValue({
         deleteOne: jest.fn().mockResolvedValue(mockDeleteResponse),
@@ -277,5 +251,55 @@ describe("Test controllers for 500 response", () => {
     expect(res.json).toHaveBeenCalledWith({
       error: "No Category found with that ID.",
     });
+  });
+
+  test("Should return 404 if category not found", async () => {
+    const { getCategoryById } = require("../controllers/categoryController");
+
+    // Mock Express req and res objects
+    const req = { params: { id: "64b2fc2a4f0c9c1d2f8c8a4b" } }; // Provide a non-existent category ID
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    // Mock the database to return null (no category found)
+    getDb.mockReturnValue({
+      collection: jest.fn().mockReturnValue({
+        findOne: jest.fn().mockResolvedValue(null), // Simulate that no category was found
+      }),
+    });
+
+    await getCategoryById(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404); // Check for 404 response
+    expect(res.json).toHaveBeenCalledWith({ error: "Category not found" }); // Ensure the correct error message
+  });
+
+  test("Should return 200 and the category if found", async () => {
+    const { getCategoryById } = require("../controllers/categoryController");
+
+    const req = { params: { id: "64b2fc2a4f0c9c1d2f8c8a4b" } }; // Provide an existing category ID
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    const mockCategory = {
+      _id: "64b2fc2a4f0c9c1d2f8c8a4b",
+      name: "Test Category",
+    };
+
+    // Mock the database to return a category
+    getDb.mockReturnValue({
+      collection: jest.fn().mockReturnValue({
+        findOne: jest.fn().mockResolvedValue(mockCategory), // Simulate that a category is found
+      }),
+    });
+
+    await getCategoryById(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200); // Check for 200 response
+    expect(res.json).toHaveBeenCalledWith(mockCategory); // Ensure the correct category is returned
   });
 });
