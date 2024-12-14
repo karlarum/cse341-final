@@ -3,9 +3,7 @@ const mongoose = require("mongoose");
 const mongoDB = require("./database/connect");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
-const categoryRoutes = require("./routes/categoryRoutes");
-const itemRoutes = require("./routes/itemRoutes");
-const userRoutes = require("./routes/userRoutes");
+const routes = require("./routes/index");
 const session = require("express-session");
 require("dotenv").config();
 
@@ -27,10 +25,7 @@ app.use(
 
 app
   .use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument))
-  .use("/category", categoryRoutes)
-  .use("/item", itemRoutes)
-  .use("/user", userRoutes)
-  .use("/", require("./src/routes"));
+  .use(routes);
 
 // Connect to MongoDB
 mongoDB.connectDb();

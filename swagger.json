@@ -5,9 +5,9 @@
         "description": "Home Inventory Manager",
         "version": "1.0.0"
     },
-    "host": "localhost:3000",
+    "host": "cse341-final-mda3.onrender.com",
     "basePath": "/",
-    "schemes": ["http"],
+    "schemes": ["https"],
     "securityDefinitions": {
         "BearerAuth": {
             "type": "apiKey",
