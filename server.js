@@ -9,7 +9,6 @@ require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT || 3000;
-const deployment = process.env.NODE_ENV || "dev";
 const secretKey = process.env.SECRET_KEY;
 
 app.use(express.json());
@@ -19,7 +18,7 @@ app.use(
     secret: secretKey,
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: deployment === "prod" },
+    cookie: { secure: false },
   })
 );
 
@@ -31,5 +30,5 @@ app
 mongoDB.connectDb();
 
 app.listen(process.env.PORT || port, () => {
-  console.log("Web Server is listening at port " + (process.env.PORT || port));
+  // console.log("Web Server is listening at port " + (process.env.PORT || port));
 });
