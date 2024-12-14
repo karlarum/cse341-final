@@ -5,11 +5,10 @@ const router = require("express").Router();
 // router.use("/", require("./swagger"));
 
 // Import session validation middleware
-const { ensureAuthenticated } = require('../src/session');
+const { ensureAuthenticated } = require("../src/session");
 
-// Set up other routes 
-// router.use("/category", require("./catergoryRoutes"));
-router.use("/category", require("./category"));
+// Set up other routes
+router.use("/category", require("./categoryRoutes"));
 router.use("/item", require("./itemRoutes"));
 router.use("/user", require("./userRoutes"));
 // router.use("/coverage", require("./coverageRoutes"));
@@ -18,5 +17,5 @@ router.use("/user", require("./userRoutes"));
 // router.use("/user", require("./userRoutes"));
 // router.use("/coverage", ensureAuthenticated, require("./coverageRoutes"));
 
-// Exports router object 
+// Exports router object
 module.exports = router;

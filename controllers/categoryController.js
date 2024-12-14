@@ -21,12 +21,15 @@ const getCategories = async (req, res) => {
 
 // Function to get a single Category by ID
 const getCategoryById = async (req, res) => {
-  const objectId = new ObjectId(req.params.id);
+  const id = req.params.id;
 
-  // Check if the contactId is a valid ObjectId
-  if (!ObjectId.isValid(objectId)) {
-    return res.status(400).json({ error: "Invalid ID" }); // Return 400 for invalid ID format
+  // Check if the ID is valid before creating the ObjectId
+  if (!ObjectId.isValid(id)) {
+    return res.status(400).json({ error: "Invalid ID" });
   }
+
+  const objectId = new ObjectId(id); // Now it's safe to create the ObjectId
+
   try {
     const db = getDb();
     const categoryCollection = db.collection("category");
@@ -38,7 +41,6 @@ const getCategoryById = async (req, res) => {
 
     res.status(200).json(category);
   } catch (error) {
-    // console.error("Error fetching Category:", error);
     res.status(500).json({ error: "Failed to fetch Category" });
   }
 };
@@ -73,6 +75,7 @@ const updateCategory = async (req, res) => {
     description: req.body.description,
     parent_id: req.body.parent_id || null,
   };
+
   try {
     const db = getDb();
     const categoryCollection = db.collection("category");
@@ -80,15 +83,21 @@ const updateCategory = async (req, res) => {
       { _id: objectId },
       { $set: updatedCategory }
     );
+
     console.log("response", response);
-    // const response = await db
-    //   .collection("Category")
-    //   .findOne({ _id: objectId }
+
+    if (response.matchedCount === 0) {
+      // If no document is found
+      return res.status(404).json({ error: "No Category found with that ID." });
+    }
 
     if (response.modifiedCount > 0) {
-      res.status(200).json({ message: "Category updated successfully." });
+      return res
+        .status(200)
+        .json({ message: "Category updated successfully." });
     } else {
-      res.status(404).json({ error: "No Category found with that ID." });
+      // If no document was modified, but it was found
+      return res.status(400).json({ error: "Category data was not changed." });
     }
   } catch (error) {
     res.status(500).json({ error: "An error occurred: " + error.message });

@@ -4,56 +4,78 @@ const coverageValidation = () => {
   return [
     body("name")
       .exists({ checkFalsy: true })
-        .withMessage("Policy name is required.")
+      .withMessage("Policy name is required.")
       .bail()
       .isAlpha("en-US", { ignore: " .,-:" })
-        .withMessage("Use only letters please.")
+      .withMessage("Use only letters please.")
       .isLength({ min: 2, max: 100 })
-        .withMessage("Please use full policy name."), 
+      .withMessage("Please use full policy name."),
     body("insuranceCompany")
       .exists({ checkFalsy: true })
-        .withMessage("Company name is required.")
+      .withMessage("Company name is required.")
       .bail()
       .isAlpha("en-US", { ignore: " .,-:" })
-        .withMessage("Only letters please.")
+      .withMessage("Only letters please.")
       .isLength({ min: 2, max: 100 })
-        .withMessage("Please use full company name."), 
+      .withMessage("Please use full company name."),
     body("policyNumber")
-    .exists({ checkFalsy: true })
+      .exists({ checkFalsy: true })
       .withMessage("Policy number is required.")
-    .bail()
-    .isNumeric()
+      .bail()
+      .isNumeric()
       .withMessage("Use only numbers please.")
-    .isLength({ min: 2, max: 15 })
-      .withMessage("Please use only a valid policy number."), 
+      .isLength({ min: 2, max: 15 })
+      .withMessage("Please use only a valid policy number."),
     body("coverageInfo")
-    .exists({ checkFalsy: true })
+      .exists({ checkFalsy: true })
       .withMessage("A policy description is required.")
-    .bail()
-    .isAlpha("en-US", { ignore: " .,-!$:;%()" })
+      .bail()
+      .isAlpha("en-US", { ignore: " .,-!$:;%()" })
       .withMessage("Please provide a brief description.")
-    .isLength({ min: 2, max: 250 })
-      .withMessage("Please use only a valid policy number."), 
+      .isLength({ min: 2, max: 250 })
+      .withMessage("Please use only a valid policy number."),
     body("contactNumber")
       .isMobilePhone("en-US")
-        .withMessage("Please use a valid US phone number."), 
-    body("email")
-      .isEmail()
-        .withMessage("Please use a valid email."), 
+      .withMessage("Please use a valid US phone number."),
+    body("email").isEmail().withMessage("Please use a valid email."),
     body("creationDate")
       .exists({ checkFalsy: true })
-        .withMessage("A policy creation date is required.")
+      .withMessage("A policy creation date is required.")
       .bail()
       .isDate({ format: "YYYY-MM-DD", strictMode: true })
-        .withMessage("Please enter date in the format YYYY-MM-DD."),
+      .withMessage("Please enter date in the format YYYY-MM-DD."),
     body("renewalDate")
       .exists({ checkFalsy: true })
-        .withMessage("A policy renewal date is required.")
+      .withMessage("A policy renewal date is required.")
       .bail()
       .isDate({ format: "YYYY-MM-DD", strictMode: true })
-        .withMessage("Please use the following format: YYYY-MM-DD.")
+      .withMessage("Please use the following format: YYYY-MM-DD."),
   ];
-}
+};
+const categoryValidation = () => {
+  return [
+    body("name")
+      .exists({ checkFalsy: true })
+      .withMessage("Category name is required.")
+      .bail()
+      .matches(/^[a-zA-Z0-9 .,-:]+$/)
+      .withMessage(
+        "Category name can only contain letters, numbers, and the following: . , - :"
+      )
+      .isLength({ min: 2, max: 50 })
+      .withMessage("Category name must be between 2 and 50 characters."),
+    body("description")
+      .optional()
+      .isLength({ max: 250 })
+      .withMessage("Description must not exceed 250 characters."),
+    body("createdAt")
+      .exists({ checkFalsy: true })
+      .withMessage("A creation date is required.")
+      .bail()
+      .isDate({ format: "YYYY-MM-DD", strictMode: true })
+      .withMessage("Please enter date in the format YYYY-MM-DD."),
+  ];
+};
 
 const idValidation = () => {
   return [
@@ -64,9 +86,9 @@ const idValidation = () => {
       // Stops validating if id is not provided
       .bail()
       .isMongoId()
-      .withMessage("Please use a valid MongoDB ID.")
+      .withMessage("Please use a valid MongoDB ID."),
   ];
-}
+};
 
 const validate = (req, res, next) => {
   const errors = validationResult(req);
@@ -77,14 +99,21 @@ const validate = (req, res, next) => {
 
   const extractedErrors = [];
 
-  errors.array().map(er => extractedErrors.push({
-    field: er.param, 
-    message: er.msg
-  }));
+  errors.array().map((er) =>
+    extractedErrors.push({
+      field: er.param,
+      message: er.msg,
+    })
+  );
 
   return res.status(422).json({
-    errors: extractedErrors, 
+    errors: extractedErrors,
   });
-}
+};
 
-module.exports = { coverageValidation, idValidation, validate }
+module.exports = {
+  coverageValidation,
+  categoryValidation,
+  idValidation,
+  validate,
+};
