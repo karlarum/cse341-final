@@ -11,8 +11,8 @@ router.use("/", require("./swagger"));
 // Commented out until routes are set up
 // router.use("/item", require("./itemRoutes"));
 // router.use("/user", require("./userRoutes"));
-router.use("/coverage", require("./coverageRoutes"));
-// router.use("/coverage", ensureAuthenticated, require("./coverageRoutes"));
+// router.use("/coverage", require("./coverageRoutes"));
+router.use("/coverage", ensureAuthenticated, require("./coverageRoutes"));
 
 // Exports router object 
 module.exports = router;
